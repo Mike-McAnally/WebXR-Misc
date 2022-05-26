@@ -11,7 +11,7 @@ Note: Please take special notice of the A-frame component version numbers used a
 
 IMPORTANT NOTICE: In some of the examples I may display wall art pieces, photos and paintings. Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only for demonstration purposes.  Also I have paid for license to a couple of songs.  Please replace these with your own songs which you have rights for.  Everything else you can copy and share. Thank you for your honesty and consideration for the licensed work of others. Enjoy!
 
-Follow me on twitter https://twitter.com/Michael_Blade and my VR Blog https://rocketvirtual.com for the latest.
+Follow me on twitter https://twitter.com/Michael_Blade and my VR Blog https://rocketvirtual.com and Medium https://michael-mcanally.medium.com/a-four-year-writing-project-in-vr-13d3d8b821a7 for the latest.
 
 
 <h2>WebXR Examples List</h2>
@@ -83,6 +83,22 @@ https://funbit64.com:3025/IslandComplex.html
 Article
 https://michael-mcanally.medium.com/treasure-island-vr-with-a-frame-f69e39acacc1
 
+
+---------------
+
+360 VR Examples (Mind Palace)
+
+https://rocketvirtual.com/aframePACKAGE/layout360VRMindPalace99.html
+
+https://funbit64.com:3025/TeleportMindPalace.html
+
+https://rocketvirtual.com/MP/Nb.html
+
+Articles
+
+https://michael-mcanally.medium.com/a-completely-immersive-360-virtual-reality-experience-6e731a3c45ee
+
+https://michael-mcanally.medium.com/my-360-mind-place-web-app-for-caputuring-immersive-vr-moments-free-open-source-code-295e4f9fbdf0
 
 ---------------
 
