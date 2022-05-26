@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Super Duper Hello World</title>
+    <meta name="description" content="Multi-User Advanced Hello World WebXR!  With Environment, Teleport, Physics, Navemesh, Video Player, and Music.">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <link rel="icon" type="image/png" href="favicon.ico"/>
+
+    <!-- A-frame components specific versions which work well together   -->
+    <script src="VRCore/aframe-v1.1.0.min.js"></script>
+    <script src="VRCore/aframe-environment-component.min.js"></script>
+    <script src="VRCore/aframe-extras.min.js"></script>
+    <script src="VRCore/aframe-teleport-controls.min.js"></script>
+    <script src="VRCore/aframe-thumb-controls-component.min.js"></script>
+    <script src="VRCore/aframe-lensflare-component.min.js"></script>
+    <script src="VRCore/aframe-text-geometry-component.min.js"></script>
+    <!-- Tracked movement of the duck 3D model  -->
+    <script src="VRCore/aframe-alongpath-component.min.js" ></script>
+    <script src="VRCore/aframe-curve-component.min.js"></script>
+    <!-- Physics engine  -->
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+    <!-- Multi-user capability with networked-aframe  -->    
+    <script src="VRCore/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+    <script src="VRCore/aframe-randomizer-components.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+
+    <!-- Style for Video Player  -->
+    <style type="text/css">
+      #video-permission {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: white;
+          z-index: 10000;
+          display: none;
+      }
+      #video-permission-button {
+        position: fixed;
+        top: calc(50% - 1em);
+        left: calc(50% - 60px);
+        width: 120px;
+        height: 2em;
+      }
+    </style>
+
+    <!-- The JavaScript below provides for selection and action on objects, environment and audio -->
+    <script type="text/javascript">
+
+      // Audio squawk for the duck
+      var squawk = new Audio('assets/mp3/duck.mp3');
+
+      // Function to execute onclick
+      function fire_laser() {
+
+        // Make Duck Quack sound
+        squawk.play();
+
+        //Disappear Duck
+        document.getElementById('movingDuck').setAttribute('visible', 'false');
+      }
+
+
+      function doCylinder() {
+        
+        // Bring back visibility of Duck and Cube, turn Sphere red again
+        document.getElementById('movingDuck').setAttribute('visible', true);
+        document.getElementById('cube').setAttribute('visible', true);
+        document.getElementById('sphere').setAttribute('color', 'red');
+      }
+
+
+      function doCube() {
+        
+        // Make Sphere green, disappear Cube for now
+        document.getElementById('sphere').setAttribute('color', 'green');
+        document.getElementById('cube').setAttribute('visible', false);      
+      }
+
+
+      // Component to do on click.
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+
+            this.el.addEventListener('click', function (evt) {
+
+                // remove clicked object from view
+                //this.setAttribute('visible', false);
+      
+            });
+        }
+      });
+
+
+      //   Solves Google Chrome mute of audio https://stackoverflow.com/questions/47921013/play-sound-on-click-in-a-frame?answertab=active#tab-top
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+
+                if(!playing) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                playing = !playing;
+            });
+        }
+      })
+
+    </script>
+
+  </head>
+  <body>
+    <div id="video-permission">
+    <button id="video-permission-button">Allow VR Video</button>
+    </div>
+
+    <button id="playButton" type="button">Play Music</button>
+
+    <audio id="playAudio" autoplay loop>
+        <!-- If you replace music, make sure it's open source or you have rights. -->
+        <source src="assets/wav/Sky.wav" type="audio/mpeg">
+    </audio>
+
+    <a-scene background="color: #FAFAFA" networked-scene="
+      room: SuperAdvancedHelloWorld;
+      debug: true;
+      adapter: easyrtc;
+      audio: true;
+      video: false;
+    " raycaster="objects: .raycastable, .clickable, a-link" shadow="type: pcfsoft" renderer="antialias: true; highRefreshRate: true" vr-mode-ui="arEnabled: false"
+    physics="debug:true; restitution: 0.1">
+
+      <a-assets>
+
+            <!-- Source of video clip to play  --> 
+            <video crossorigin="anonymous" id="video-src" src="assets/video/waterfalling.mp4"></video>
+
+            <!-- Our font -->
+            <a-asset-item id="optimerBoldFont" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+            <!-- Video Player Controls  -->
+            <img crossorigin="anonymous" src="assets/img/play2.png" id="play" >
+            <img crossorigin="anonymous" src="assets/img/pause.png" id="pause" >
+            <img crossorigin="anonymous" src="assets/img/volume-normal.png" id="volume-normal" >
+            <img crossorigin="anonymous" src="assets/img/volume-mute.png" id="volume-mute" >
+            <img crossorigin="anonymous" src="assets/img/seek-back.png" id="seek-back" >
+
+            <!-- Duck 3D GltF model -->
+            <a-asset-item id="duck" src="assets/gltf/Duck.glb"></a-asset-item>
+
+            <!-- Required for Sun lens flare to work  -->
+            <img crossorigin="anonymous" id="flare-asset" src="assets/img/adjustflare.jpg">
+
+
+
+            <!-- As a substitution for a proper avatar we just use a robot head  --> 
+            <a-asset-item id="RobotHead" src="assets/gltf/FinalEditRoboHead.glb"></a-asset-item>
+            <a-asset-item id="LHand" src="assets/gltf/leftHandLow.glb"></a-asset-item>
+            <a-asset-item id="RHand" src="assets/gltf/rightHandLow.glb"></a-asset-item>
+            <template id="avatar-template">
+                <a-entity networked-audio-source></a-entity>
+            </template>
+            <template id="head-template">
+                <a-entity class="cam" gltf-model="#RobotHead" scale="0.004 0.004 0.004"></a-entity>
+            </template>
+            <template id="hand-left">
+              <a-entity class="leftController">
+                <a-entity gltf-model="#LHand" ></a-entity>
+              </a-entity>
+            </template>
+            <template id="hand-right">
+              <a-entity class="rightController">
+                <a-entity gltf-model="#RHand" ></a-entity>
+              </a-entity>
+            </template>
+
+      </a-assets>
+
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+
+      <!-- nav-mesh: protecting us from running thru sphere, cube and cylinder  -->
+      <a-entity id="navmesh-Hello" gltf-model="assets/gltf/AdvHelloWorldnavmesh.gltf" visible="false" nav-mesh=""></a-entity>
+
+      <!-- Basic movement and teleportation  -->
+      <a-entity id="cameraRig" movement-controls="constrainToNavMesh: true;" networked="template:#avatar-template;attachTemplateToLocal:false;" spawn-in-circle="radius:1" navigator="cameraRig: #cameraRig; cameraHead: #cam; collisionEntities: .collision; ignoreEntities: .clickable" position="0 0 0" rotation="0 0 0">
+        <!-- camera -->
+        <a-entity id="head" camera="active: true" position="0 1.6 0"  networked="template:#head-template;attachTemplateToLocal:false;" look-controls="pointerLockEnabled: false; reverseMouseDrag: true" ></a-entity>
+              <!-- Left Controller -->
+              <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" networked="template:#hand-left;attachTemplateToLocal:false;" teleport-controls="cameraRig: #cameraRig; teleportOrigin: #head; button: trigger; type: line; curveShootingSpeed: 10; landingMaxAngle: 60" visible="true"></a-entity>
+              <!-- Right Controller -->
+              <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" networked="template:#hand-right;attachTemplateToLocal:false;" laser-controls raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;" line="color: #7cfc00; opacity: 0.5" visible="true"></a-entity>
+      </a-entity>
+
+      <a-sphere id="flare" radius="0.05" color="yellow" lensflare="createLight:false; relative: true; src: #flare-asset; lightColor:yellow; intensity: 5; lightDecay: 500" position="0 60 0"></a-sphere>
+
+      <!-- Normal A-frame objects with physics and click assigned  -->
+      <a-box dynamic-body="mass: 1" spring="target: #cubeOriginal; damping: 0.25; stiffness: 25;" id="cube" class="clickable" position="-1 5 -3" rotation="0 45 0" color="#4CC3D9" visible="true" shadow  onclick="doCube();" click-listener></a-box>
+      <a-sphere dynamic-body="mass: 1" spring="target: #sphereOriginal; damping: 0.25; stiffness: 25;" id="sphere" class="clickable" position="0 5 -5" radius="1.25" color="#EF2D5E" shadow audiohandler></a-sphere>
+      <a-cylinder dynamic-body="shape: cylinder; cylinderAxis: y; mass: 1" spring="target: #cylinderOriginal; damping: 0.25; stiffness: 25;" id="cylinder" class="clickable" position="0 5 -3" radius="0.5" height="1.5" color="#FFC65D" shadow onclick="doCylinder();" click-listener></a-cylinder>
+      <a-plane static-body position="0 0.08958 -4" rotation="-90 0 0" width="8" height="8" color="#7BC8A4" shadow="recieve: true" ></a-plane >
+
+      <!-- Some 3D Text -->
+      <a-entity position="-6.657 2.801 -5.127" text-geometry="value: Multi-user Advanced" material="color: #EC4DF4"></a-entity>
+      <a-entity position="-0.05 2.793 -5.090" text-geometry="value: Hello World A-frame WebXR; font: #optimerBoldFont" material="color: #F94DA2"></a-entity>
+
+      <a-entity id="movingDuck" class="clickable" gltf-model="#duck" alongpath="curve:#track;loop:true;dur:14000;rotate:true" position="0 1.6 -5" shadow="receive:false" scale="1 1 1" animation__rotate="property: rotation; dur: 2000; easing: linear; loop: true; to: 0 360 0" shadow onclick="fire_laser();" click-listener></a-entity>
+
+      <!-- A track for our Duck to follow  --> 
+      <a-curve id="track" >
+        <a-curve-point position="0 1 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="5 1 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>  
+        <a-curve-point position="7 1 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="5 1 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="0 1 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="-6 1 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="-8 1 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="-6 1 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+        <a-curve-point position="0 1 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="true"></a-curve-point>
+      </a-curve>
+
+      <!-- The track line in red  --> 
+      <a-draw-curve curveref="#track" material="shader: line; color: red;"></a-draw-curve>
+
+      <!-- Our Environment -->
+      <a-entity environment="preset: forest; dressing: mushrooms; dressingColor: #6e1d8b;" shadow="recieve: true"></a-entity>
+
+      <!-- A light in the scene casting shadows -->
+      <a-entity light="intensity: 0.6; castShadow: true; shadowCameraLeft: -50; shadowCameraBottom: -50; shadowCameraRight: 50; shadowCameraTop: 50; shadowCameraVisible: false" position="9.9649 17.32329 13.93447"></a-entity>
+
+      <!-- Position of video player elements  -->
+      <a-sound id="alert-sound" src="src: url(assets/wav/action.wav)" autoplay="false" position="0 0 0"></a-sound>
+      <a-video id="video-screen" src="#video-src" position="3.13189 1.55443 -0.28064" rotation="0 -90 0" scale="0.50761 0.49394 1" width="8" height="4" rotation="0 0 0" visible="true"></a-video> 
+      <a-image class="clickable" id="control-back" width="0.4" height="0.4" src="#seek-back" position="3.12841 0.261 -0.85992" rotation="0 -90 0" visible="false" scale="0.85 0.85 0.85"></a-image>
+      <a-image class="clickable" id="control-play" width="0.4" height="0.4" src="#play" position="3.12841 0.261 -0.38565" rotation="0 -90 0"></a-image>
+      <a-image class="clickable" id="control-volume" width="0.4" height="0.4" src="#volume-mute" position="3.12841 0.261 0.090" rotation="0 -90 0" visible="false" scale="0.75 0.75 0.75"></a-image>
+      <a-entity id="progress-bar" geometry="primitive:plane;height:0.1;width:4" material="opacity:0;transparent:true" position="3.06712 0.514 -0.277" rotation="0 -90 0" visible="false" >
+      <a-plane id="progress-bar-track" width="4" height="0.1" color="gray" position="" opacity="0.2" material="" visible="false" geometry=""></a-plane>
+      <a-plane id="progress-bar-fill" width="4" height="0.1" color="#7198e5" position="" geometry="" visible="false" material=""></a-plane>
+      </a-entity>
+
+    </a-scene>
+
+    <script>
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#head-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-left',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-right',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+
+      function onConnect() {
+        console.log("connected to a room!");
+      }
+
+      window.onload = function() {
+        var context = new AudioContext();
+      }
+
+      document.querySelector('button').addEventListener('click', function() {
+        context.resume().then(() => {
+        console.log('Playback resumed successfully');
+        });
+      });
+
+// Video Player Code
+      var AVideoPlayer = function() {
+      this.duration         = 0;
+      this.current_progress = 0;
+      this.progressWidth    = 4;
+      this.paused           = true;
+      this.elProgressBar   = null;
+      this.elProgressTrack = null;
+      this.elProgressFill  = null;
+      this.elAlertSound    = null;
+      this.elVideo         = null;
+      this.elVideoScreen   = null;
+      this.elControlBack   = null;
+      this.elControlPlay   = null;
+      this.elControlVolume = null;
+      this._initElements = function() {
+        this.elProgressBar   = document.getElementById('progress-bar');
+        this.elProgressTrack = document.getElementById('progress-bar-track');
+        this.elProgressFill  = document.getElementById('progress-bar-fill');
+        this.elAlertSound    = document.getElementById('alert-sound');
+        this.elVideo         = document.getElementById('video-src');
+        this.elVideoScreen   = document.getElementById('video-screen');
+        this.elControlBack   = document.getElementById('control-back');
+        this.elControlPlay   = document.getElementById('control-play');
+        this.elControlVolume = document.getElementById('control-volume');
+      }
+
+      this.setProgress = function(progress) {
+        var new_progress = this.progressWidth*progress;
+        this._setProgressWidth(new_progress);
+        var progress_coord = this._getProgressCoord();
+        if (progress_coord != undefined) {
+         progress_coord.x = -(this.progressWidth-new_progress)/2;
+         this._setProgressCoord(progress_coord);
+        }
+      }
+      this._getProgressCoord = function() {
+        return AFRAME.utils.coordinates.parse(this.elProgressFill.getAttribute("position"))
+      }
+      this._getProgressWidth = function() {
+        return parseFloat(this.elProgressFill.getAttribute("width"));
+      }
+      this._setProgressCoord = function(coord) {
+        this.elProgressFill.setAttribute("position", coord);
+      }
+      this._setProgressWidth = function(width) {
+        this.elProgressFill.setAttribute("width", width);
+      }
+      this.isProgressBarVisible = function(isVisible) {
+        this.elProgressTrack.setAttribute("visible", isVisible);
+        this.elProgressFill.setAttribute("visible", isVisible);
+      }
+      this.isControlVisible = function(isVisible) {
+        this.elControlBack.setAttribute("visible", isVisible);
+        this.elControlVolume.setAttribute("visible", isVisible);
+        this.elVideoScreen.setAttribute("visible", isVisible);
+      }
+      this._addPlayerEvents = function() {
+        var that = this;
+        this.elVideo.pause();
+        this.elVideo.onplay = function() {
+          that.duration = this.duration;
+        }
+        this.elVideo.ontimeupdate = function() {
+          if (that.duration > 0) {
+            that.current_progress = this.currentTime/that.duration;
+          }
+          that.setProgress(that.current_progress);
+        }
+      }
+      this._addControlsEvent = function() {
+        var that = this;
+        this.elControlPlay.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.paused) {
+            this.setAttribute('src', '#pause');
+            that.elVideo.play();
+            that.paused = false;
+            that.isProgressBarVisible(true);
+            that.isControlVisible(true);
+          } else {
+            this.setAttribute('src', '#play');
+            that.elVideo.pause();
+            that.paused = true;
+            that.isProgressBarVisible(false);
+            that.isControlVisible(false);
+         }
+        });
+        this.elControlVolume.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.muted) {
+            that.elVideo.muted = false;
+            this.setAttribute('src', '#volume-normal');
+          } else {
+            that.elVideo.muted = true;
+            this.setAttribute('src', '#volume-mute');
+          }
+        });
+        this.elControlBack.addEventListener('click', function () {
+          that._playAudioAlert();
+          that.elVideo.currentTime = 0;
+        });
+      }
+      this._addProgressEvent = function() {
+        var that = this;
+        this.elProgressBar.addEventListener('click', function (e) {
+          if (e.detail == undefined || e.detail.intersection == undefined || that.duration === 0) {
+            return;
+          }
+          let seekedPosition = (e.detail.intersection.point.x+(that.progressWidth/2))/that.progressWidth;
+          try {
+            let seekedTime = seekedPosition*that.duration;
+            that.elVideo.currentTime = seekedTime;
+          } catch (e) {
+          }
+        });
+      }
+      this._playAudioAlert = function() {
+        if (this.elAlertSound.components !== undefined && this.elAlertSound.components.sound !== undefined) {
+         this.elAlertSound.components.sound.playSound();
+        }
+      }
+      this._mobileFriendly = function() {
+        if (AFRAME.utils.device.isMobile()) {
+          var that = this;
+          let video_permission        = document.getElementById('video-permission');
+         let video_permission_button = document.getElementById('video-permission-button');
+          video_permission.style.display = 'block';
+          video_permission_button.addEventListener("click", function() {
+            video_permission.style.display = 'none';
+            that.elVideo.play();
+            that.elVideo.pause();
+          }, false);
+        }
+      }
+      this.init = function() {
+        this._initElements();
+        this.setProgress(this.current_progress);
+        this._addPlayerEvents();
+        this._addControlsEvent();
+        this._addProgressEvent();
+        this._mobileFriendly();
+      }
+      this.init();
+    }
+      let scene = document.querySelector('a-scene');
+      var cursor = document.querySelector('a-cursor');
+      scene.lightOff = function() {
+        scene.islightOn = true;
+        scene.removeAttribute('animation__fogback');
+        scene.setAttribute('animation__fog', "property: fog.color; to: #0c192a; dur: 800; easing: easeInQuad;");
+      }
+      scene.lightOn = function() {
+        scene.islightOn = false;
+        scene.removeAttribute('animation__fog');
+        scene.setAttribute('animation__fogback', "property: fog.color; to: #dbdedb; dur: 800");
+      }
+      var videoPlayer = new AVideoPlayer();
+      document.querySelector('#control-play').addEventListener('click', function () {
+        if (videoPlayer.paused) {
+          scene.lightOn()
+        } else {
+          scene.lightOff();
+        }
+      });
+
+    </script>
+
+  </body>
+</html>
