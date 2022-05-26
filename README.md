@@ -58,10 +58,21 @@ https://michael-mcanally.medium.com/advanced-hello-world-for-a-frame-68738e022f0
 
 ---------------
 
+VR Art Room Gallery  - IMPORTANT: Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only.  You can also purchase some of my art as NFTs on OpenSea.
 
+https://funbit64.com:3025/ArtRoomGallery.html
+
+Article
+https://michael-mcanally.medium.com/vr-galleries-nfts-metaverse-70dd573058ce
 
 ---------------
 
+VR Island Art Complex -IMPORTANT: Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only.
+
+https://funbit64.com:3025/IslandComplex.html
+
+Article
+https://michael-mcanally.medium.com/treasure-island-vr-with-a-frame-f69e39acacc1
 
 
 ---------------
