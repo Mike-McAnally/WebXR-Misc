@@ -40,6 +40,12 @@ https://rocketvirtual.com/aframePACKAGE/NewBeMyValentineCard2.html
 
 ---------------
 
+Happy Holidays VR Card with Multi-user Social VR
+
+https://funbit64.com:3025/h.html
+
+Article
+https://javascript.plainenglish.io/happy-holiday-vr-card-experience-1ca22c1dd66e
 
 
 ---------------
