@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Island Art Complex - Loading user space, please wait.</title>
+    <meta name="description" content="Island Art VR Gallery and Meeting Complex by Michael McAnally, VRArtscape - May 31, 2021.">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <script src="VRCore/aframe-master.min.js"></script>
+    <script src="VRCore/aframe-extras.min.js"></script>
+    <script src="VRCore/aframe-teleport-controls.min.js"></script>
+    <script src="VRCore/aframe-text-geometry-component.min.js"></script>
+    <script src="VRCore/aframe-alongpath-component.min.js" ></script>
+    <script src="VRCore/aframe-curve-component.min.js"></script>
+    <script src="VRCore/aframe-thumb-controls-component.min.js"></script>
+    <script src="VRCore/aframe-lensflare-component.min.js"></script>
+    <script src="VRCore/aframe-particle-system-component.min.js"></script>
+    <script src="VRCore/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+    <script src="VRCore/aframe-randomizer-components.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+    <script src="/js/info-message3.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/loader.css">
+    <script src="/js/loader.js"></script>
+    <script type="text/javascript">
+      var Speech = true;
+      var audio1 = new Audio('assets/wav/action.wav');
+      var audio2 = new Audio('assets/wav/swoosh.wav');
+      var not360video = false;
+
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+            this.el.addEventListener('click', function (evt) {
+            });
+        }
+      });
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+                if(!playing) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                playing = !playing;
+            });
+        }
+      })
+     AFRAME.registerComponent('navigate', {
+        schema: {url: {default: ''}},
+        init: function () {
+        var data = this.data;
+            this.el.addEventListener('click', function () {
+                window.location = data.url;
+            });
+        }
+     });
+      function speakInfo(narration) {
+        var audio_msg = new SpeechSynthesisUtterance(narration);
+        if (Speech === true) {
+            window.speechSynthesis.speak(audio_msg);
+        }
+      }
+      function changeOrb(orb_num) {
+        document.getElementById('orbSky').setAttribute('material', 'src: #orb' + orb_num.toString());
+        removeScene();
+      }
+      function removeScene() {
+        document.getElementById('MeetingBuildings').setAttribute('visible', false);
+        document.getElementById('RocketVirtualTXT').setAttribute('visible', false);
+        document.getElementById('RocketVirtualTXT2').setAttribute('visible', false);
+        document.getElementById('The_Island').setAttribute('visible', false);
+        document.getElementById('ourOcean').setAttribute('visible', false);
+        document.getElementById('artworkPosition1').setAttribute('visible', false);
+
+        document.getElementById('artworkPosition3').setAttribute('visible', false);
+        document.getElementById('artworkPosition4').setAttribute('visible', false);
+        document.getElementById('artworkPosition5').setAttribute('visible', false);
+
+        document.getElementById('artworkPosition11').setAttribute('visible', false);
+        document.getElementById('artworkPosition12').setAttribute('visible', false);
+        document.getElementById('artworkPosition13').setAttribute('visible', false);
+        document.getElementById('artworkPosition17').setAttribute('visible', false);
+        document.getElementById('ShootRaygun').setAttribute('visible', false);
+        document.getElementById('Pedistal').setAttribute('visible', false);
+        document.getElementById('Bust').setAttribute('visible', false);
+        document.getElementById('Pedistal2').setAttribute('visible', false);
+        document.getElementById('Palm_Tree1').setAttribute('visible', false);
+        document.getElementById('Palm_Tree2').setAttribute('visible', false);
+        document.getElementById('Palm_Tree3').setAttribute('visible', false);
+        document.getElementById('Palm_Tree4').setAttribute('visible', false);
+        document.getElementById('Palm_Tree6').setAttribute('visible', false);
+        document.getElementById('Palm_Tree7').setAttribute('visible', false);
+        document.getElementById('bridge-3').setAttribute('visible', false);
+        document.getElementById('bridge-7').setAttribute('visible', false);
+        document.getElementById('bridge-8').setAttribute('visible', false);
+        document.getElementById('Foundation').setAttribute('visible', false);
+        document.getElementById('FishA').setAttribute('visible', false);
+        document.getElementById('FishB').setAttribute('visible', false);
+        document.getElementById('FishC').setAttribute('visible', false);
+        document.getElementById('FishD').setAttribute('visible', false);
+        document.getElementById('FishE').setAttribute('visible', false);
+        document.getElementById('FishF').setAttribute('visible', false);
+        document.getElementById('FishG').setAttribute('visible', false);
+        document.getElementById('FishH').setAttribute('visible', false);
+
+        document.getElementById('flare').setAttribute('visible', false);
+        document.getElementById('cylinder1').setAttribute('visible', false);
+        document.getElementById('sphere1').setAttribute('visible', false);
+        document.getElementById('cylinder2').setAttribute('visible', false);
+        document.getElementById('sphere2').setAttribute('visible', false);
+        document.getElementById('modelSculpture').setAttribute('visible', false);
+        document.getElementById('cylinder3').setAttribute('visible', false);
+        document.getElementById('waterfountain').setAttribute('visible', false);
+        document.getElementById('cylinder4').setAttribute('visible', false);
+        document.getElementById('cylinder5').setAttribute('visible', false);
+        document.getElementById('water').setAttribute('visible', false);
+        document.getElementById('water-bridge').setAttribute('visible', false);
+        document.getElementById('Treasure').setAttribute('visible', false);
+        document.getElementById('fillWithGold').setAttribute('visible', false);
+
+
+        document.getElementById('MovementControls').setAttribute('visible', false);
+        document.getElementById('ReturnIsland').setAttribute('visible', true);
+      }
+      function restoreScene() {
+        document.getElementById('orbSky').setAttribute('material', 'src: #orb1');
+        document.getElementById('MeetingBuildings').setAttribute('visible', true);
+        document.getElementById('RocketVirtualTXT').setAttribute('visible', true);
+        document.getElementById('RocketVirtualTXT2').setAttribute('visible', true);
+        document.getElementById('The_Island').setAttribute('visible', true);
+        document.getElementById('ourOcean').setAttribute('visible', true);
+        document.getElementById('artworkPosition1').setAttribute('visible', true);
+;
+        document.getElementById('artworkPosition3').setAttribute('visible', true);
+        document.getElementById('artworkPosition4').setAttribute('visible', true);
+        document.getElementById('artworkPosition5').setAttribute('visible', true);
+
+        document.getElementById('artworkPosition11').setAttribute('visible', true);
+        document.getElementById('artworkPosition12').setAttribute('visible', true);
+        document.getElementById('artworkPosition13').setAttribute('visible', true);
+        document.getElementById('artworkPosition17').setAttribute('visible', true);
+        document.getElementById('ShootRaygun').setAttribute('visible', true);
+        document.getElementById('Pedistal').setAttribute('visible', true);
+        document.getElementById('Bust').setAttribute('visible', true);
+        document.getElementById('Pedistal2').setAttribute('visible', true);
+        document.getElementById('Palm_Tree1').setAttribute('visible', true);
+        document.getElementById('Palm_Tree2').setAttribute('visible', true);
+        document.getElementById('Palm_Tree3').setAttribute('visible', true);
+        document.getElementById('Palm_Tree4').setAttribute('visible', true);
+        document.getElementById('Palm_Tree6').setAttribute('visible', true);
+        document.getElementById('Palm_Tree7').setAttribute('visible', true);
+        document.getElementById('bridge-3').setAttribute('visible', true);
+        document.getElementById('bridge-7').setAttribute('visible', true);
+        document.getElementById('bridge-8').setAttribute('visible', true);
+        document.getElementById('Foundation').setAttribute('visible', true);
+        document.getElementById('FishA').setAttribute('visible', true);
+        document.getElementById('FishB').setAttribute('visible', true);
+        document.getElementById('FishC').setAttribute('visible', true);
+        document.getElementById('FishD').setAttribute('visible', true);
+        document.getElementById('FishE').setAttribute('visible', true);
+        document.getElementById('FishF').setAttribute('visible', true);
+        document.getElementById('FishG').setAttribute('visible', true);
+        document.getElementById('FishH').setAttribute('visible', true);
+
+        document.getElementById('flare').setAttribute('visible', true);
+        document.getElementById('cylinder1').setAttribute('visible', true);
+        document.getElementById('sphere1').setAttribute('visible', true);
+        document.getElementById('cylinder2').setAttribute('visible', true);
+        document.getElementById('sphere2').setAttribute('visible', true);
+        document.getElementById('modelSculpture').setAttribute('visible', true);
+        document.getElementById('cylinder3').setAttribute('visible', true);
+        document.getElementById('waterfountain').setAttribute('visible', true);
+        document.getElementById('cylinder4').setAttribute('visible', true);
+        document.getElementById('cylinder5').setAttribute('visible', true);
+        document.getElementById('water').setAttribute('visible', true);
+        document.getElementById('water-bridge').setAttribute('visible', true);
+        document.getElementById('Treasure').setAttribute('visible', true);
+        document.getElementById('fillWithGold').setAttribute('visible', true);
+
+
+
+        document.getElementById('MovementControls').setAttribute('visible', true);
+        document.getElementById('ReturnIsland').setAttribute('visible', false);
+      }
+      function sqrImg(imgNum) {
+        document.getElementById('orb_2Dimg' + imgNum).setAttribute('visible', true);
+        document.getElementById('OrbName_place' + imgNum).setAttribute('visible', true);
+      }
+      function dspImg(dimgNum) {
+        document.getElementById('orb_2Dimg' + dimgNum).setAttribute('visible', false);
+        document.getElementById('OrbName_place' + dimgNum).setAttribute('visible', false);
+      }
+      function playSwoosh() {
+        audio2.play();
+      }
+
+      function playBlip() {
+        audio1.play();
+      }
+      function playSound() {
+      }
+      function play360() {
+          document.getElementById('vrVideo360').setAttribute('visible', true);
+          document.getElementById('orbSky').setAttribute('visible', false);
+      }
+      function STOPplay360() {
+          document.getElementById('vrVideo360').setAttribute('visible', false);
+          document.getElementById('orbSky').setAttribute('visible', true);
+      }
+
+    </script>
+  </head>
+  <body>
+    <div id="splash">
+      <div class="loading"></div>
+      <div class="start-button"><Font color="limegreen">Select here, then VR Button at lower right or Instructions</Font></div>
+    </div>
+    <button id="playButton" type="button">Play Music</button>
+    <audio id="playAudio" autoplay loop>
+        <!-- <source src="https://rocketvirtual.com/A-Frame_WebXR/assets/mp3/Romanzeandante.mp3" type="audio/mpeg"> --->
+    </audio>
+    <a-scene networked-scene="
+      room: ArtIslandComplex;
+      debug: true;
+      adapter: easyrtc;
+      audio: true;
+      video: false;
+    " info-message="htmlSrc: #messageText" shadow="type: pcfsoft" renderer="antialias: true; highRefreshRate: true"> 
+      <a-assets timeout="30000">
+        <a-asset-item crossorigin="anonymous" id="Island" src="assets/gltf/IslandSmooth.glb"></a-asset-item>
+        <img crossorigin="anonymous" src="assets/img/floor1.jpg" id="floor" >
+        <img crossorigin="anonymous" id="orb1" src="assets/360/image/skyland2.jpg">
+        <img crossorigin="anonymous" id="flare-asset" src="assets/img/adjustflare.jpg">
+        <a-asset-item id="MeetingComplex" src="assets/gltf/finalBuildingArtComplex2.glb" nav-agent="speed: 1.0; active: true"></a-asset-item>
+        <a-asset-item crossorigin="anonymous" id="Palm" src="assets/gltf/PalmMinimal.glb"></a-asset-item>
+        <a-asset-item id="messageText" src="ControlsMessage.html" response-type="text"></a-asset-item>
+        <a-asset-item id="optimerBoldFont" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+        <a-asset-item id="fountain" src="assets/gltf/marble_fountain.glb"></a-asset-item>        
+
+        <img crossorigin="anonymous" id="artwork1" src="artwork/DSC_0137med6.jpg">
+
+        <img crossorigin="anonymous" id="artwork3" src="artwork/DSC01280rmed6.jpg">
+        <img crossorigin="anonymous" id="artwork4" src="artwork/DSC01693med6.jpg">
+        <img crossorigin="anonymous" id="artwork5" src="artwork/DSC01361.jpg">
+       
+        <img crossorigin="anonymous" id="artwork11" src="artwork/DSC00921med6.jpg">
+        <img crossorigin="anonymous" id="artwork12" src="artwork/DSC01255r.jpg">
+        <img crossorigin="anonymous" id="artwork13" src="artwork/DSC01428med6.jpg">
+        <img crossorigin="anonymous" id="artwork17" src="artwork/DSC00580med6.jpg">
+
+        <img crossorigin="anonymous" id="blog" src="assets/img/wallInfo1.jpg">
+        <img crossorigin="anonymous" id="writings" src="assets/img/wallInfo2.jpg">
+        <img crossorigin="anonymous" id="server" src="assets/img/VRArtScapeCover3Final.png">
+        <img crossorigin="anonymous" id="movementInstructions" src="assets/img/movementControl.jpg">                
+
+        <img crossorigin="anonymous" id="orb5" src="assets/360/image/theBeach.jpg">
+        <img crossorigin="anonymous" id="orb7" src="assets/360/image/SAM_101_0152.jpg">
+        <img crossorigin="anonymous" id="orb8" src="assets/360/image/SAM_101_0128.jpg">
+        <img crossorigin="anonymous" id="orbthumb5" src="assets/360/image/thumb/theBeach_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb7" src="assets/360/image/thumb/SAM_101_0152_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb8" src="assets/360/image/thumb/SAM_101_0128_thumb.jpg">
+        <img crossorigin="anonymous" id="imgthumb5" src="assets/360/image/imgthumb/theBeach.jpg">
+        <img crossorigin="anonymous" id="imgthumb7" src="assets/360/image/imgthumb/SAM_101_0152_imgthumb.jpg">
+        <img crossorigin="anonymous" id="imgthumb8" src="assets/360/image/imgthumb/SAM_101_0128_imgthumb.jpg">
+        <img crossorigin="anonymous" id="ReturnBack" src="assets/img/ReturnBack.png">
+        <a-asset-item id="fish1" src="assets/gltf/fishes/fish1.glb"></a-asset-item>
+        <a-asset-item id="fish2" src="assets/gltf/fishes/fish2.glb"></a-asset-item>
+        <a-asset-item id="fish3" src="assets/gltf/fishes/fish5.glb"></a-asset-item>
+        <a-asset-item id="fish4" src="assets/gltf/fishes/fish15.glb"></a-asset-item>
+
+        <a-asset-item id="ShapeSculpture" src="assets/gltfSculpture/ShapesScuplture3.glb"></a-asset-item>
+        <a-asset-item id="Raygun" src="assets/gltf/raygun4/raygun.glb"></a-asset-item>
+        <a-asset-item id="MeBustAvatar" src="assets/gltf/FinalMeBustAvatar.glb"></a-asset-item>
+        <a-asset-item id="Chest" src="assets/gltf/testChest2.glb"></a-asset-item>
+        <img crossorigin="anonymous" src="assets/img/coins.jpg" id="coins">
+        <a-mixin id="marble" geometry="primitive: sphere" scale=".30 .30 .30" animation__rotation="startEvents: mouseenter; pauseEvents: mouseleave; resumeEvents: mouseenter; property: rotation; to: 0 360 0; loop: true; dur: 10000" animation__mouseenter="startEvents: mouseenter; pauseEvents: mouseleave; resumeEvents: mouseenter; property: components.material.material.color; type: color; to: white;  dur: 500; " animation__mouseleave="property: components.material.material.color; type: color; to: gray; startEvents: mouseleave; dur: 500;" shadow ></a-mixin>
+        <a-mixin id="spin" animation="property: rotation; to: 0 360 0; loop: true; dur: 100000; easing: linear"></a-mixin>
+
+        <a-asset-item id="RobotHead" src="assets/gltf/FinalEditRoboHead.glb"></a-asset-item>
+        <a-asset-item id="LHand" src="assets/gltf/leftHandLow.glb"></a-asset-item>
+        <a-asset-item id="RHand" src="assets/gltf/rightHandLow.glb"></a-asset-item>
+        <template id="avatar-template">
+          <a-entity networked-audio-source><!-- <a-box color="#FFF" position="0 1.4 0" material="" networked-video-source="" geometry="" scale="0.325 0.325 0.325"></a-box>  --></a-entity>
+        </template>
+        <template id="head-template">
+          <a-entity class="cam" gltf-model="#RobotHead" scale="0.004 0.004 0.004"></a-entity>
+        </template>
+        <template id="hand-left">
+          <a-entity class="leftController">
+            <a-entity gltf-model="#LHand" ></a-entity>
+          </a-entity>
+        </template>
+        <template id="hand-right">
+          <a-entity class="rightController">
+            <a-entity gltf-model="#RHand" ></a-entity>
+          </a-entity>
+        </template>  
+      </a-assets>
+
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+      <a-entity id="navmesh-walls" gltf-model="assets/gltf/FURTHERIslandNavmesh.gltf" visible="false" nav-mesh=""></a-entity>
+      <a-entity id="avatar" networked="template:#avatar-template;attachTemplateToLocal:false;"
+        movement-controls="constrainToNavMesh: true;" spawn-in-circle="radius:1">
+        <a-entity class="cam" networked="template:#head-template;attachTemplateToLocal:false;" camera="active: true"
+          position="0 1.6 0" look-controls></a-entity>
+        <a-entity class="leftController" networked="template:#hand-left;attachTemplateToLocal:false;"
+          hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"  teleport-controls="cameraRig: #avatar; teleportOrigin: #cam; button: trigger; type: line; curveShootingSpeed: 10; collisionEntities: #navmesh-walls; landingMaxAngle: 60" visible="true" ></a-entity>
+        <a-entity class="rightController" networked="template:#hand-right;attachTemplateToLocal:false;"
+          hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;" line="color: #7cfc00; opacity: 0.5" visible="true"></a-entity>
+      </a-entity>
+
+      <a-entity id="The_Island" gltf-model="#Island" position="-208.88164 -9.83526 -154.40424" scale="140 140 140" visible="" shadow="cast: false; receive: true"></a-entity>
+      <a-entity id="ambientlight" light="type: ambient; intensity: .95"></a-entity>
+      <a-box id="Foundation" position="-3.32823 -0.09738 -7.89352" rotation="-90.00021045914971 90 0" scale="13.29474 10.89561 0.32555" width="4" height="4" color="#FFFFFF" shadow="receive: true" material="src: #floor; color: white; transparent: true; repeat: 50 50" geometry=""></a-box>
+      <a-ocean id="ourOcean" position="-47.35699 -2.58219 40.11002" scale="6 6 6" width="50" depth="50" opacity=".55" ocean="color: #06C6CB; density: 45; amplitude: -0.2; speed: 0.95; speedVariance: 0.2"></a-ocean>
+      <a-sky id="orbSky" material="src: #orb1" rotation="0 0 0" ></a-sky>
+      <a-sphere id="flare" radius="0.05" color="yellow" lensflare="createLight:false; relative: true; src: #flare-asset; lightColor:yellow; intensity: 5; lightDecay: 500" position="-303.76151 57.79742 4.88911"></a-sphere>
+      <a-entity id="MeetingBuildings" gltf-model="#MeetingComplex" position="9.89561 0.07 9.46907" rotation="0 90 0" scale="0.2 0.2 0.2" shadow=""></a-entity>
+      <!-- Bridges allowing us to move around the island and on multiple levels.  -->
+      <a-box id="water-bridge" position="-44.05655 -4.30731 -22.47425" rotation="-72.20929796254252 179.95229246350846 89.64325775278321" scale="6.0626 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-box id="bridge-3" position="-31.82349 5.17492 28.89981" rotation="-72.60521179897792 142.80400085840637 -82.01718949959195" scale="13.92453 1 0.143" width="4" height="4" color="#FFFFFF" opacity=".35" material="" geometry=""></a-box>
+      <a-box id="bridge-7" position="-36.59874 -0.42997 -9.33153" rotation="-89.12816869496059 -90.00021045914971 90.00021045914971" scale="7.25388 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-box id="bridge-8" position="-91.33488 -0.62497 -42.07341" rotation="-89.66732198017871 44.930204378568895 -55.969382217354465" scale="8.09068 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-entity id="Palm_Tree1" gltf-model="#Palm" position="-122.21544 1.35503 -25.99071" rotation="0 0 0" scale=".002 .004 .002" shadow></a-entity>
+      <a-entity id="Palm_Tree2" gltf-model="#Palm" position="26.89416 -0.91787 0.262" rotation="0 78.26 0" scale=".002 .004 .002" shadow></a-entity>
+      <a-entity id="Palm_Tree3" gltf-model="#Palm" position="-53.19211 -1.21051 -11.23701" rotation="0 78.26 0" scale="0.002 0.003 0.002" shadow=""></a-entity>
+      <a-entity id="Palm_Tree4" gltf-model="#Palm" position="0.36459 -0.13506 -41.8833" rotation="-6.868045090233179 61.74422383447803 5.194435370656045" scale="0.002 0.003 0.002" shadow=""></a-entity>
+      <a-entity id="Palm_Tree6" gltf-model="#Palm" position="3.31197 0.23619 -4.07842" rotation="0 78.26 0" scale="0.002 0.003 0.002" shadow></a-entity>
+      <a-entity id="Palm_Tree7" gltf-model="#Palm" position="-4.80875 0.18785 -12.51019" rotation="-0.7522935850067709 58.93100106038569 7.000971298703528" scale="0.002 0.003 0.002" shadow></a-entity>
+      <a-entity id="RocketVirtualTXT" position="-12.68773 1.86857 -4.77643" rotation="0 90 0" text-geometry="value:Treasure Island VR Art Gallery; font: #optimerBoldFont" scale="0.25 0.25 0.25" material="color: #1C93EE"></a-entity>
+
+      <a-entity id="RocketVirtualTXT2" position="-18.286 1.06533 -9.08848" rotation="0 90 0" text-geometry="value: VR &amp; Art by Michael McAnally; font: #optimerBoldFont" scale="0.1 0.1 0.3" material="color: #1C93EE"></a-entity>
+
+      <a-entity id="TextSpot" position="-12.32473 1.90418 -5.60294" rotation="-1.4169246273585259 84.1428629195273 -86.78649018626092" light="angle: 75; decay: 0.65; distance: 1; type: spot; intensity: 0.35; color: #d57cbd"></a-entity>
+      <a-entity id="TeleportingOrbsTXT" position="-16.02098 0.28739 1.42069" rotation="0 -180 0" text-geometry="value: Teleporting Orbs; font: #optimerBoldFont" scale="0.2 0.2 0.2" material="color: #F9CF45"></a-entity>
+
+      <a-cylinder id="cylinder1" position="3.27909 0.08504 -4.09886" scale="1.372 0.113 1.372" radius="0.5" height="1.5" color="#E3E3E3" shadow="" material="" geometry=""></a-cylinder>
+      <a-sphere id="sphere1" position="3.29485 -0.0407 -4.11462" scale="0.457 0.307 0.457" radius="1.25" color="#51A727" shadow="" material="" geometry=""></a-sphere>
+      <a-cylinder id="cylinder2" position="-4.82067 0.08504 -12.49902" scale="1.372 0.113 1.372" radius="0.5" height="1.5" color="#E3E3E3" shadow="" material="" geometry=""></a-cylinder>
+      <a-sphere id="sphere2" position="-4.81461 -0.0407 -12.5219" scale="0.457 0.307 0.457" radius="1.25" color="#51A727" shadow="" material="" geometry=""></a-sphere>
+      <a-entity id="waterfountain" gltf-model="#fountain" position="-1.46323 -0.14203 -9.20374" scale="2 .75 2" shadow=""></a-entity>
+      <a-entity id="water" position="-1.46256 1.416 -9.20641" particle-system="color:#000, #FFF;duration:NaN;velocitySpread:2 3 2;velocityValue:0 9 0;accelerationSpread:1 0 1;particleCount:45;maxAge:1.5;texture: https://funbit64.com:3025/assets/img/dot2.png" visible="true"></a-entity>
+
+      <!-- Our Treasure Chest in glTF format Link to license: https://creativecommons.org/licenses/by/4.0/  Location: https://sketchfab.com/3d-models/old-chest-efc357374ecf4d17a36e85f1237e624c -->
+      <a-entity id="Treasure" gltf-model="#Chest" position="-36.36444 -9.686 -2.52202" rotation="0 -48.819441891916924 0" scale="0.01 0.01 0.01" visible="true"></a-entity>
+
+      <a-plane id="fillWithGold" position="-36.36285 -9.226 -2.50207" rotation="-89.67878113608133 66.30955154608043 -113.66164852466733" width="4" height="4" color="#EBE3B6" material="src: #coins" visible="true" scale="0.261 0.117 0.407"></a-plane>
+
+      <a-cylinder id="cylinder4" position="-1.45858 0.07067 -9.22259" scale="2.292 0.207 2.292" radius="0.5" height="1.5" color="#18C7D2" shadow="" material="" geometry="" opacity=".35"></a-cylinder>
+
+      <a-cylinder id="cylinder5" position="-1.45858 1.01776 -9.22259" scale="1.36 0.00668 1.36" radius="0.5" height="1.5" color="#18C7D2" shadow="" material="" geometry="" opacity=".35"></a-cylinder>      
+
+      <a-plane id="MovementControls" position="-1.36776 1.949 1.94834" scale="2 1 2" rotation="0 180 0" material="src: #movementInstructions; color: white; transparent: true; side: double" geometry="" ></a-plane>
+
+      <a-plane id="artworkPosition1" position="-13.11489 1.9 -5.99867" scale="1.33 1 1" rotation="0 -90 0" material="src: #artwork1; color: white; transparent: true; side: double" geometry="" ></a-plane>
+     
+      <a-plane id="artworkPosition3" position="-13.11958 1.949 -9.1733" scale="2.113 1.5 1" rotation="0 -90 0" material="src: #artwork3; color: white; transparent: true; side: double" geometry="" ></a-plane>
+      <a-plane id="artworkPosition4" position="-17.80046 1.9 -20.07479" scale="1.33 1 1" rotation="0 0 0" material="src: #artwork4; color: white; transparent: true; side: double" geometry="" ></a-plane>
+      <a-plane id="artworkPosition5" position="-16.021 1.89725 -20.06922" scale="1 1 1" rotation="0 0 90" material="src: #artwork5; color: white; transparent: true; side: double" geometry="" ></a-plane>
+
+      <a-plane id="artworkPosition11" position="-13.12109 1.9 -12.52271" scale="1.33 1 1" rotation="0 -90 0" material="src: #artwork11; color: white; transparent: true; side: double" geometry="" ></a-plane>
+      <a-plane id="artworkPosition12" position="-13.10936 1.9 -17.81295" scale="1.33 1 1" rotation="0 -90 0" material="src: #artwork12; color: white; transparent: true; side: double" geometry="" ></a-plane>
+      <a-plane id="artworkPosition13" position="-14.233 1.9 -20.07479" scale="1.33 1 1" rotation="0 0 0" material="src: #artwork13; color: white; transparent: true; side: double" geometry="" ></a-plane>
+      <a-plane id="artworkPosition17" position="-13.11489 1.9 -0.33735" scale="1.33 1 1" rotation="0 -90 0" material="src: #artwork17; color: white; transparent: true; side: double" geometry="" ></a-plane>
+
+      <a-entity id="Bust" gltf-model="#MeBustAvatar" position="-18.19386 1.04973 -9.46061" rotation="-8.10105026535471 68.5767455414131 1.267382642829381" scale="0.003 0.003 0.003" shadow visible=""></a-entity>
+      <a-box id="Pedistal2" position="-18.44864 0.55738 -9.53211" rotation="0 45 0" color="#FFFFFF" visible="" shadow="" material="" geometry=""></a-box>
+      <a-entity id="PedistalSpot2" position="-18.06221 1.61283 -9.53659" rotation="-32.965126742851915 84.53533900919192 94.74716579180858" light="angle: 55; decay: 0.65; distance: 0.6; type: spot; intensity: 5; color: #d57cbd"></a-entity>
+
+      <a-entity id="ShootRaygun" gltf-model="#Raygun" position="-18.19039 0.92387 -14.97825" rotation="77.82714914380024 -84.96276552435951 0" scale="0.2 0.195 0.195" shadow visible=""></a-entity>
+      <a-box id="Pedistal" position="-18.44864 0.55738 -14.90843" rotation="0 45 0" color="#FFFFFF" visible="" shadow="" material="" geometry=""></a-box>
+      <a-entity id="GunPedistalSpot" position="-18.44864 1.398 -14.90843" rotation="-90.680 -0.538 4.844" light="angle: 55; decay: 0.5; distance: 1; type: spot"></a-entity>
+
+      <a-entity id="modelSculpture" position="-18.449 1.313 -4.08966" rotation="0 0 0" scale="0.0001 0.0001 0.0001" gltf-model="#ShapeSculpture" mixin="spin" shadow="recieve: false; cast: true"></a-entity>
+      <a-cylinder id="cylinder3" position="-18.449 0.52434 -4.08966" radius="0.5" height="1.5" scale=".7 0.660 .7" color="#FFFFFF" shadow></a-cylinder>
+      <a-entity id="SculptureSpot" position="-18.449 1.967 -4.08966" rotation="-88.61766329949904 -119.47201352508898 123.77091586195557" light="angle: 75; decay: 0.7; distance: 1.5; type: spot; intensity: 0.7"></a-entity>
+
+      <a-sphere id="orb_place5" class="clickable" mixin="marble" position="-15.2652 0.83949 1.28868" rotation="0 45 0" material="src: #orbthumb5" onclick="playSwoosh();changeOrb(5);STOPplay360();"  onmouseenter="sqrImg(5);" onmouseleave="dspImg(5);"></a-sphere>
+      <a-sphere id="orb_place7" class="clickable" mixin="marble" position="-17.84266 0.83949 1.28868" rotation="0 45 0" material="src: #orbthumb7" onclick="playSwoosh();changeOrb(7);STOPplay360();"  onmouseenter="sqrImg(7);" onmouseleave="dspImg(7);"></a-sphere>
+      <a-sphere id="orb_place8" class="clickable" mixin="marble" position="-16.52535 0.83949 1.28868" rotation="0 45 0" material="src: #orbthumb8" onclick="playSwoosh();changeOrb(8);STOPplay360();"  onmouseenter="sqrImg(8);" onmouseleave="dspImg(8);"></a-sphere>
+      <a-entity id="OrbName_place5" material="color: #F9CF45" class="clickable" position="-15.9627 2.8206 1.78232" rotation="0 180 0" text-geometry="value: The Beach; size: 0.12; font: #optimerBoldFont" onclick="playBlip();speakInfo('The Beach');" visible="false"></a-entity>
+      <a-entity id="OrbName_place7" material="color: #F9CF45" class="clickable" position="-15.9627 2.8206 1.78232" rotation="0 180 0" text-geometry="value: Pier and Bridge; size: 0.12; font: #optimerBoldFont" onclick="playBlip();speakInfo('Pier and Bridge');" visible="false"></a-entity>
+      <a-entity id="OrbName_place8" material="color: #F9CF45" class="clickable" position="-15.9627 2.8206 1.78232" rotation="0 180 0" text-geometry="value: Downtown SF; size: 0.12; font: #optimerBoldFont" onclick="playBlip();speakInfo('San Francisco Market Street');" visible="false"></a-entity>
+      <a-plane id="orb_2Dimg5" position="-16.55312 1.85704 1.7512" scale="2.168 1.8 0.1" rotation="0 180 0" material="src: #imgthumb5; side: double"  visible="false"></a-plane>
+      <a-plane id="orb_2Dimg7" position="-16.55312 1.85704 1.7512" scale="2.168 1.8 0.1" rotation="0 180 0" material="src: #imgthumb7; side: double" visible="false"></a-plane>
+      <a-plane id="orb_2Dimg8" position="-16.55312 1.85704 1.7512" scale="2.168 1.8 0.1" rotation="0 180 0" material="src: #imgthumb8; side: double" visible="false"></a-plane>
+      <a-box id="ReturnIsland" class="clickable" position="-17.44352 0.29908 1.42523" rotation="-27.12095723251752 -180 0" material="src: #ReturnBack" scale="0.3 0.3 0.3" onclick="restoreScene();" shadow visible="false"></a-box>
+
+      <a-entity id="shadowcamera" light="intensity: 0.25; castShadow: true; shadowCameraLeft: -100; shadowCameraBottom: -100; shadowCameraRight: 100; shadowCameraTop: 100; shadowCameraVisible: false; angle: 180; decay: 0.5; shadowCameraFar: 100; shadowMapHeight: 1024; shadowMapWidth: 1024" position="-30.43253 34.92862 0.12768"></a-entity>
+
+    <a-curve id="tracA" >
+        <a-curve-point position="-33.15232 -3 -1.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-37.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3 -7.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3 -9.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -7.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-38.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3 -1.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracB" curve="">
+        <a-curve-point position="-33.15232 -3 -3.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-37.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -3.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3 -1.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-29.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3 -3.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3 -3.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracC" curve="">
+        <a-curve-point position="-31.15232 -3.5 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-32.15232 -3.5 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-33.15232 -3.5 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3.5 -6.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3.5 -3.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3.5 -1.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-32.15232 -3.5 -3.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3.5 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-31.15232 -3.5 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracD" curve="">
+        <a-curve-point position="-30.15232 -3.5 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3.5 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-32.15232 -3.5 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-31.15232 -3.5 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3.5 5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-32.15232 -3.5 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-30.15232 -3.5 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-32.15232 -3.5 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3.5 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracE" curve="">
+        <a-curve-point position="-33.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-33.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-30.15232 -3 -6.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-30.15232 -3 -6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-29.15232 -3 -1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracF" curve="">
+        <a-curve-point position="-29.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-31.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-33.15232 -3 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-38.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-34.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-30.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-29.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracG" curve="">
+        <a-curve-point position="-32.15232 -3 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-34.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-34.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-36.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-37.15232 -3 -4.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-36.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-33.15232 -3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-32.15232 -3 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracH" curve="">
+        <a-curve-point position="-35.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-37.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-33.15232 -3 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-37.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-33.15232 -3 -1.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-34.15232 -3 -2.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-35.15232 -3 -5.87581" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-entity id="FishA" gltf-model="#fish1" alongpath="curve:#tracA;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishB" gltf-model="#fish2" alongpath="curve:#tracB;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishC" gltf-model="#fish3" alongpath="curve:#tracC;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishD" gltf-model="#fish4" alongpath="curve:#tracD;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishE" gltf-model="#fish1" alongpath="curve:#tracE;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishF" gltf-model="#fish2" alongpath="curve:#tracF;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishG" gltf-model="#fish3" alongpath="curve:#tracG;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    <a-entity id="FishH" gltf-model="#fish4" alongpath="curve:#tracH;loop:true;dur:12000;rotate:true" scale="0.001 0.001 0.001" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90"></a-entity>
+    </a-scene>
+    <script>
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#head-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-left',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-right',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      function onConnect() {
+        console.log("connected to a room!");
+      }
+window.onload = function() {
+  var context = new AudioContext();
+}
+document.querySelector('button').addEventListener('click', function() {
+  context.resume().then(() => {
+    console.log('Playback resumed successfully');
+  });
+});
+
+    </script>
+  </body>
+</html>
