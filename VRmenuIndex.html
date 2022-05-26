@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Fun Bit 64</title>
+    <meta name="description" content="My VR Server Sandbox for learning and demonstration developed with A-frame along with social VR capability using NAF (networked-aframe-component). Tuned for the Oculus Quest 2.">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <link rel="icon" type="image/png" href="favicon.ico"/>
+    <script src="VRCore/a-frame1.0.4.min.js"></script>
+    <script src="VRCore/aframe-environment-component.min.js"></script>
+    <script src="VRCore/aframe-extras.min.js"></script>
+    <script src="VRCore/aframe-teleport-controls.min.js"></script>
+    <script src="VRCore/aframe-thumb-controls-component.min.js"></script>
+    <script src="VRCore/aframe-lensflare-component.min.js"></script>
+    <script src="VRCore/aframe-text-geometry-component.min.js"></script>
+    <script src="VRCore/aframe-alongpath-component.min.js" ></script>
+    <script src="VRCore/aframe-curve-component.min.js"></script>
+    <script src="VRCore/aframe-particle-system-component.min.js"></script>
+
+<script type="text/javascript">
+
+var planets = ["starry", "yavapai", "contact", "egypt", "threetowers", "goaland", "goldmine", "poison", "arches", "tron", "dream"];
+
+var m = 0;  //counter to visit another planet    
+
+      // Audio squawk for the duck
+      var squawk = new Audio('assets/mp3/duck.mp3');
+
+/* global AFRAME */
+
+      // Component to do on click.
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+
+            this.el.addEventListener('click', function (evt) {
+      
+            });
+        }
+      });
+
+
+function changePlanet() {
+    m = m + 1;
+    if (m == planets.length)  { 
+        m = 0;  //reset to array beginning
+    }
+    // change our environment, may pause play for a moment and redraw
+    document.getElementById('onplanet').setAttribute('environment', 'preset: ' + planets[m]);
+}
+
+
+
+AFRAME.registerComponent('highlight', {
+  init: function () {
+    var buttonEls = this.buttonEls = this.el.querySelectorAll('.menu-button');
+    var backgroundEl = document.querySelector('#background');
+    this.onClick = this.onClick.bind(this);
+    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
+    this.reset = this.reset.bind(this);
+    backgroundEl.addEventListener('click', this.reset);
+    for (var i = 0; i < buttonEls.length; ++i) {
+      buttonEls[i].addEventListener('mouseenter', this.onMouseEnter);
+      buttonEls[i].addEventListener('mouseleave', this.onMouseLeave);
+      buttonEls[i].addEventListener('click', this.onClick);
+    }
+  },
+
+  onClick: function (evt) {
+    evt.target.pause();
+    evt.target.setAttribute('material', 'color', '#046de7');
+    this.el.addState('clicked');
+    evt.target.object3D.scale.set(1.2, 1.2, 1.2);
+  },
+
+  onMouseEnter: function (evt) {
+    var buttonEls = this.buttonEls;
+    evt.target.setAttribute('material', 'color', '#046de7');
+    for (var i = 0; i < buttonEls.length; ++i) {
+      if (evt.target === buttonEls[i]) { continue; }
+      buttonEls[i].setAttribute('material', 'color', 'white');
+    }
+  },
+
+  onMouseLeave: function (evt) {
+    if (this.el.is('clicked')) { return; }
+    evt.target.setAttribute('material', 'color', 'white');
+  },
+
+  reset: function () {
+    var buttonEls = this.buttonEls;
+    for (var i = 0; i < buttonEls.length; ++i) {
+      this.el.removeState('clicked');
+      buttonEls[i].play();
+      buttonEls[i].emit('mouseleave');
+    }
+  }
+});
+
+// for immersive navigation for "when" all the browsers support in WebXR
+
+AFRAME.registerComponent('navigate', {
+  schema: {url: {default: ''}},
+  init: function () {
+    var data = this.data;
+    this.el.addEventListener('click', function () {
+      window.location = data.url;
+    });
+  }
+});
+
+      // Function to execute onclick
+      function fire_laser() {
+
+        // Make Duck Quack sound
+        squawk.play();
+
+        //Disappear Duck
+        document.getElementById('movingDuck').setAttribute('visible', 'false');
+      }
+
+</script>
+
+  </head>
+  <body>
+
+    <a-scene
+      background="color: #212" 
+      webxr="referenceSpaceType: local" raycaster="objects: .raycastable, .clickable, a-link">
+      <a-assets>
+        <a-asset-item id="Rocket" src="assets/gltf/rocket4.glb"></a-asset-item>
+        <img crossorigin="anonymous" id="flare-asset" src="assets/img/adjustflare.jpg">
+        <!-- Our font -->
+        <a-asset-item id="optimerBoldFont" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+        <!-- Duck 3D GltF model -->
+        <a-asset-item id="duck" src="assets/gltf/Duck.glb"></a-asset-item>
+
+        <img id="Card1" src="assets/img/card14.jpg" crossorigin="anonymous"/>
+        <img id="Card2" src="assets/img/card2.jpg" crossorigin="anonymous"/>
+        <img id="Card3" src="assets/img/card3.jpg" crossorigin="anonymous"/>
+        <img id="Card4" src="assets/img/card6.jpg" crossorigin="anonymous"/>
+        <img id="Card5" src="assets/img/card5.jpg" crossorigin="anonymous"/>
+        <img id="Card10" src="assets/img/card10.jpg" crossorigin="anonymous"/>
+        <img id="Card11" src="assets/img/card11.jpg" crossorigin="anonymous"/>
+        <img id="Card12" src="assets/img/card12.jpg" crossorigin="anonymous"/>
+        <img id="Card13" src="assets/img/card13.jpg" crossorigin="anonymous"/>
+
+        <a-mixin
+          id="frame"
+          geometry="primitive: plane; width: 0.5783552; height: 0.8192"
+          material="color: white; shader: flat"
+          animation__scale="property: scale; to: 1.2 1.2 1.2; dur: 200; startEvents: mouseenter"
+          animation__scale_reverse="property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave"
+         ></a-mixin>
+
+         <a-mixin
+          id="poster"
+          geometry="primitive: plane; width: 0.544768; height: 0.786432"
+          material="color: white; shader: flat"
+          material="shader: flat"
+          position="0 0 0.005"
+         ></a-mixin>
+
+        <a-mixin
+          id="frameButton"
+          geometry="primitive: plane; width: 0.5783552; height: 0.340"
+          material="color: white; shader: flat"
+          animation__scale="property: scale; to: 1.2 1.2 1.2; dur: 200; startEvents: mouseenter"
+          animation__scale_reverse="property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave"
+         ></a-mixin>
+
+         <a-mixin
+          id="posterButton"
+          geometry="primitive: plane; width: 0.544768; height: 0.295"
+          material="color: white; shader: flat"
+          material="shader: flat"
+          position="0 0 0.005"
+         ></a-mixin>
+      </a-assets>
+
+      <a-entity
+        id="background"
+        position="0 0 0"
+        geometry="primitive: sphere; radius: 2.0"
+        material="color: red; side: back; shader: flat"
+        scale="0.001 0.001 0.001"
+        visible="false" class="raycastable">
+      </a-entity>
+    <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+     <a-entity id="cameraRig" movement-controls="constrainToNavMesh: false;" navigator="cameraRig: #cameraRig; cameraHead: #head; collisionEntities: .collision; ignoreEntities: .clickable" rotation="0 0 0">
+        <a-entity id="head" position="0 1.6 -0.9" camera="active: true" look-controls animation="property: position;
+                                         dur: 7000;
+                                         from: 0 1.6 20;
+                                         to: 0 1.6 -0.9;
+                                         easing: easeInOutSine;
+                                         loop: false;
+                                         direction: normal"></a-entity>
+
+              <a-entity id="leftHand" hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" teleport-controls="cameraRig: #cameraRig; teleportOrigin: #head; button: trigger; curveShootingSpeed: 18; landingMaxAngle: 60" visible="true"></a-entity>
+              <a-entity id="rightHand" hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="objects: .raycastable, .clickable, a-link; showLine: true; far: 10; interval: 0" line="color: #7cfc00; opacity: 0.5" visible="true"></a-entity>
+      </a-entity>
+
+      <a-entity id="onplanet" environment="preset: starry; seed: 2; shadow: true; dressingAmount: 35;fog:0.65"></a-entity>
+
+      <a-entity id="LargeRocket" gltf-model="#Rocket" position="-1.41288 2.84425 -2.81812" rotation="-31.88395538344005 -93.65568119208437 -70.1380555331446" scale="0.3 0.3 0.3" shadow visible=""></a-entity>
+
+       <!-- Spot light to show our text labels -->   
+      <a-entity id="spot" light="type: spot; decay: 0; intensity: 1.75" position="0 1.311 1.43592"></a-entity>
+
+      <a-entity id="menuTitle" class="clickable" position="-0.52944 2.30667 -2.51871" text-geometry="value: Fun Bit 64; font: #optimerBoldFont" scale=".3 .3 .3" material="color: #FFFFFF" onclick="location.href='https://funbit64.com/node/1';"></a-entity>
+
+      <a-entity id="HostedTXT" class="clickable" position="-0.517 2.17886 -2.51656" rotation="0 0 0" text-geometry="value: Metaverse Virtual Reality Server by Michael McAnally, © 2022; font: #optimerBoldFont" scale="0.1 0.1 0.1" material="color: #26B2B1" click="location.href='http://michaelmcanally.info';" cursor-listener></a-entity>
+
+      <a-plane id="ArtistLINK" class="clickable" position="0.855 2.204 -2.511" scale="0.579 0.078 1" rotation="" material="color: #A99731; side: double" geometry="" onclick="location.href='http://michaelmcanally.info';" cursor-listener opacity=".3"></a-plane>
+
+      <a-entity id="ServerTXT" position="-1.726 0.884 -2.51656" rotation="0 0 0" text-geometry="value: Welcome to my VR server! All examples will take some time to load the first time due to the large number of graphic files.; font: #optimerBoldFont" scale="0.1 0.1 0.1" material="color: #26B2B1" ></a-entity>
+
+      <a-entity id="ServerTXT2" position="-1.726 0.803 -2.51656" rotation="0 0 0" text-geometry="value: Please be patient for a good immersive experience. Pages have been tuned for best VR on Oculus Quest 2.; font: #optimerBoldFont" scale="0.1 0.1 0.1" material="color: #26B2B1" ></a-entity>
+
+      <a-entity id="ServerTXT3" position="-1.726 0.718 -2.51656" rotation="0 0 0" text-geometry="value: Select VR button right corner to enter VR. Checkout the blog and VR articles for further information.  Enjoy, and follow me on twitter.; font: #optimerBoldFont" scale="0.1 0.1 0.1" material="color: #26B2B1" click="location.href='https://twitter.com/Michael_Blade';" cursor-listener></a-entity>
+
+      <a-plane id="ArtistLINK2" class="clickable" position="2.058 0.73673 -2.511" scale="0.64456 0.078 1" rotation="" material="color: #A99731; side: double" geometry="" onclick="location.href='https://twitter.com/Michael_Blade';" cursor-listener opacity=".3"></a-plane>
+
+      <a-entity id="ui" position="-0.39415 1.6 -2.5">
+        <!-- Card menu -->
+        <a-entity id="menu" highlight>
+          <a-entity id="WebXRBlog" position="-0.8 0 0" mixin="frame" class="raycastable menu-button" navigate="url: https://funbit64.com/node/9">
+            <a-entity material="src: #Card1; side: double" mixin="poster"></a-entity>
+            <a-entity position="-0.2 -0.5 0" text-geometry="value: ART GALLERY; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="VROffice" position="0 0 0" mixin="frame" class="raycastable menu-button" navigate="url: https://funbit64.com/node/2">
+            <a-entity material="src: #Card2; side: double" mixin="poster"></a-entity>
+            <a-entity position="-0.168 -0.5 0" text-geometry="value: VR ISLAND; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="ArtGallery" position="0.8 0 0" mixin="frame" class="raycastable menu-button" navigate="url: https://vrartscape.com/">
+            <a-entity material="src: #Card3; side: double" mixin="poster"></a-entity>
+            <a-entity position="-0.207 -0.5 0" text-geometry="value: ART STARTUP; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="TestLinks" position="1.5701 0.240 0" mixin="frameButton" class="raycastable menu-button" navigate="url: https://funbit64.com/node/35">
+            <a-entity material="src: #Card10; side: double" mixin="posterButton"></a-entity>
+            <a-entity position="-0.276 -0.250 0" text-geometry="value: SPACE CAROUSEL; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="DevLinks" position="1.5701 -0.240 0" mixin="frameButton" class="raycastable menu-button" navigate="url: https://funbit64.com/node/36">
+            <a-entity material="src: #Card11; side: double" mixin="posterButton"></a-entity>
+            <a-entity position="-0.141 -0.263 0" text-geometry="value: VALENTINE; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="TestLinks2" position="-1.58308 0.24 0" mixin="frameButton" class="raycastable menu-button" navigate="url: https://rocketvirtual.com/index.html">
+            <a-entity material="src: #Card4; side: double" mixin="posterButton"></a-entity>
+            <a-entity position="-0.204 -0.250 0" text-geometry="value: WEBXR BLOG; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="DevLinks2" position="-1.58308 -0.24 0" mixin="frameButton" class="raycastable menu-button" navigate="url: https://rocketvirtual.com/MP/index.html">
+            <a-entity material="src: #Card5; side: double" mixin="posterButton"></a-entity>
+            <a-entity position="-0.213 -0.263 0" text-geometry="value: MIND PALACE; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="TestLinks3" position="2.34048 0.24 0" mixin="frameButton" class="raycastable menu-button" navigate="url: https://funbit64.com/node/44">
+            <a-entity material="src: #Card12; side: double" mixin="posterButton"></a-entity>
+            <a-entity position="-0.231 -0.250 0" text-geometry="value: HOLIDAY CARD; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+          <a-entity id="DevLinks3" position="2.34944 -0.24 0" mixin="frameButton" class="raycastable menu-button" navigate="url: https://funbit64.com/node/38">
+            <a-entity material="src: #Card13; side: double" mixin="posterButton"></a-entity>
+            <a-entity position="-0.289 -0.263 0" text-geometry="value: VR SOLAR SYSTEM; font: #optimerBoldFont" scale=".1 .1 .1" material="color: #FFFFFF"></a-entity>
+          </a-entity>
+
+        </a-entity>
+
+      </a-entity>
+
+      <a-entity id="movingDuck" class="clickable" gltf-model="#duck" alongpath="curve:#track;loop:true;dur:14000;rotate:true" position="0 1.6 -5" shadow="receive:false" scale="1 1 1" animation__rotate="property: rotation; dur: 2000; easing: linear; loop: true; to: 0 360 0" shadow onclick="fire_laser();" click-listener></a-entity>
+
+
+      <a-curve id="track" >
+        <a-curve-point position="0 1 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 1 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="7 1 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 1 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 1 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 1 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-8 1 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 1 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 1 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+      </a-curve>
+
+
+
+      <a-sphere id="flare" radius="0.05" color="yellow" lensflare="createLight:false; relative: true; src: #flare-asset; lightColor:yellow; intensity: 5; lightDecay: 500" position="0.84338 5.24072 -86.37081"></a-sphere>
+      
+      <a-entity position="0 2.25 -15" particle-system="preset: snow; particleCount: 400"></a-entity>
+
+    </a-scene>
+
+<script>
+
+function changeEnv() {
+    m = m + 1;
+    if (m == planets.length)  { 
+        m = 0;  //reset to array beginning
+    }
+    // change our environment, may pause play for a moment and redraw
+    document.getElementById('onplanet').setAttribute('environment', 'preset: ' + planets[m]);
+}
+
+window.onload = function() {            
+    setInterval("changeEnv()",12000)
+}
+
+
+</script>
+
+
+  </body>
+</html>
