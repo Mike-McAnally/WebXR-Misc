@@ -5,7 +5,7 @@
 
 <h2>WebXR Misc Template Code Examples</h2>
 
-Welecome to my simple code example templates for starting your own projects. These are A-frame VR examples of basic HTML and JavaScript.  Does not include associated assets and other code components, those can be accessed from the servers themselves. When available I have include links to articles I have written explaining how the code works.  Many of the examples use networked-aframe https://github.com/networked-aframe/networked-aframe a multi-user WebRTC social VR component for servers.
+Welecome to my simple code example templates for starting your own projects. These are A-frame VR examples of basic HTML and JavaScript.  Does not include associated assets and other code components, those can be accessed from the servers themselves, but you should ultimately copy them to your own webserver. When available I have include links to articles I have written explaining how the code works.  Many of the examples use networked-aframe https://github.com/networked-aframe/networked-aframe a multi-user WebRTC social VR component for servers.
 
 Note: Please take special notice of the A-frame component version numbers used as there have been many changes and deprications and some later versions of A-frame and THREE.js that may break these code examples.  Some changes also have occured to the browsers, Chrome, Firefox, the Meta Quest Browser.  As of May 26, 2022 these examples worked well on the Oculus Meta Quest 2.  No guarentees they will continue to work as the WebXR space is rapidly evolving.  Best always to search for other working examples on the web which may be more current and compare.
 
