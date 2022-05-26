@@ -1,5 +1,5 @@
 # WebXR-Misc
-WebXR Misc Examples
+WebXR Misc Code Examples
 
 VR Menu Index Example
 https://funbit64.com/index.html
