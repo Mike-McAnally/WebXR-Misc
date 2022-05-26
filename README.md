@@ -58,7 +58,7 @@ https://javascript.plainenglish.io/happy-holiday-vr-card-experience-1ca22c1dd66e
 
 
 ---------------
-Super Duper Hello World - Multi-User Advanced Hello World WebXR!  With Environment, Teleport, Physics, Navemesh, Video Player, and Music.
+Super Duper Hello World - Multi-User Advanced Hello World WebXR!  With Environment, Teleport, Physics, Navmesh, Video Player, and Music.
 
 https://funbit64.com:3025/SuperDuper.html
 
