@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,shrink-to-fit=no,user-scalable=no,maximum-scale=1,minimum-scale=1">
+    <title>Solar System VR (Loading 8 planet textures, please wait.)</title>
+    <meta name="description" content="When I was in first grade I did a science project on the planets in the solar system. It had Styrofoam globes cut in half and glued to a board. There was also index cards hand printed describing each of the planets copied out of an astronomy book of the time. Honestly, my dad helped me a lot. He wanted to encourage me to be interested in science and exploration. I didn't win the science fair. Now over 50 years later, I get to repeat the exercise myself!"></meta>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <script src="aframe-master/dist/aframe-v1.1.0.min.js"></script>
+    <script src="aframe-extras-master/dist/aframe-extras.min.js"></script>
+    <script src="aframe-teleport-controls-master/dist/aframe-teleport-controls.js"></script>
+    <script src="superframe-master/components/thumb-controls/dist/aframe-thumb-controls-component.min.js"></script>
+    <script type="text/javascript">
+      var nIntervId;
+      function startInterval(IimgNum) {
+        nIntervId = setTimeout(invisImg, 7000, IimgNum);
+      }
+      function visImg(imgNum) {
+        // Make the 2D Popup image visible
+        document.getElementById('2Dimg' + imgNum).setAttribute('visible', true);
+        startInterval();
+      }
+      function invisImg(dimgNum) {
+        // Make the 2D Popup image invisible
+        document.getElementById('2Dimg' + dimgNum).setAttribute('visible', false);
+      }
+</script>
+</head>
+<body>
+    <a-scene raycaster="objects: .clickable"> 
+      <a-assets timeout="10000">
+        <!-- Mixin gives shape to the planetoid, we also use this for the sun  --> 
+        <a-mixin id="planetoid" geometry="primitive: sphere; radius: 2; segmentsWidth: 20; segmentsHeight: 20" shadow="receive: false"></a-mixin>
+        <!-- Mixin gives an orbit -->
+        <a-mixin id="orbit" rotation="0 0 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 100000; easing: linear"></a-mixin>
+        <!-- Mixin gives a turning rotation (spin) --> 
+        <a-mixin id="spin" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear"></a-mixin>
+        <!-- Mixin gives position, scale, transparency and invisibility to planetary info panels --> 
+        <a-mixin id="pInfo" position="0 .45 -0.85" scale="2 1 0" material="transparent: true" visible="false"></a-mixin>
+        <!-- Load planet and other equirectangular texture maps -->
+        <img crossorigin="anonymous" id="milkyway" src="assets/img/solarSystemPlanets/starsMilkyWay.png">
+        <img crossorigin="anonymous" id="sol" src="assets/img/solarSystemPlanets/sun.png">
+        <img crossorigin="anonymous" id="mercurymap" src="assets/img/solarSystemPlanets/mercury.png">
+        <img crossorigin="anonymous" id="venusmap" src="assets/img/solarSystemPlanets/venus.png">
+        <img crossorigin="anonymous" id="earthmap" src="assets/img/solarSystemPlanets/earthwClouds.png">
+        <img crossorigin="anonymous" id="marsmap" src="assets/img/solarSystemPlanets/mars.png">
+        <img crossorigin="anonymous" id="jupitermap" src="assets/img/solarSystemPlanets/jupiter.png">
+        <img crossorigin="anonymous" id="saturnmap" src="assets/img/solarSystemPlanets/saturn.png">
+        <img crossorigin="anonymous" id="uranusmap" src="assets/img/solarSystemPlanets/uranus.png">
+        <img crossorigin="anonymous" id="neptunemap" src="assets/img/solarSystemPlanets/neptune.png">
+        <img crossorigin="anonymous" id="plutomap" src="assets/img/solarSystemPlanets/pluto.png">
+        <img crossorigin="anonymous" id="moonmap" src="assets/img/solarSystemPlanets/moon.png">
+        <img crossorigin="anonymous" id="saturnRings" src="assets/img/solarSystemPlanets/saturnRings.png">
+        <!-- planet info image popups to be displayed -->
+        <img crossorigin="anonymous" id="img0" src="assets/img/solarSystemPlanets/planetImages/sunInfo.png">
+        <img crossorigin="anonymous" id="img1" src="assets/img/solarSystemPlanets/planetImages/mercuryInfo.png">
+        <img crossorigin="anonymous" id="img2" src="assets/img/solarSystemPlanets/planetImages/venusInfo.png">
+        <img crossorigin="anonymous" id="img3" src="assets/img/solarSystemPlanets/planetImages/earthInfo.png">
+        <img crossorigin="anonymous" id="img4" src="assets/img/solarSystemPlanets/planetImages/marsInfo.png">
+        <img crossorigin="anonymous" id="img5" src="assets/img/solarSystemPlanets/planetImages/jupiterInfo.png">
+        <img crossorigin="anonymous" id="img6" src="assets/img/solarSystemPlanets/planetImages/saturnInfo.png">
+        <img crossorigin="anonymous" id="img7" src="assets/img/solarSystemPlanets/planetImages/uranusInfo.png">
+        <img crossorigin="anonymous" id="img8" src="assets/img/solarSystemPlanets/planetImages/neptuneInfo.png">
+      </a-assets>
+        <!-- Sky or in this case space "The MilkyWay" -->
+        <a-sky src="#milkyway"></a-sky>
+        <!-- Create 8 Solar System orbiting planetary objects around The Sun.  Note: this is not to scale at all, in orbit or planetoid size, and distance from sun.  For learning animation only! -->
+        <a-entity id="sun" class="clickable" animation="delay: 0" mixin="planetoid spin" position="0 0 0" scale="3 3 3" onmouseenter="visImg(0);" onmouseleave="startInterval(0);" material="src: #sol"></a-entity>
+        <a-entity mixin="orbit" animation="delay: 0">
+            <a-entity id="mercury" class="clickable" mixin="planetoid spin" position="8 0 0" scale=".03 .03 .03" onmouseenter="visImg(1);" onmouseleave="startInterval(1);"  material="src: #mercurymap"></a-entity>
+        </a-entity>
+        <!-- Venus is one of just two planets that rotate from east to west. Only Venus and Uranus have this "backwards" rotation. It completes one rotation in 243 Earth days - the longest day of any planet in our solar system, even longer than a whole year on Venus.  -->
+        <a-entity mixin="orbit" animation="delay: 3000">
+            <a-entity id="venus" class="clickable" mixin="planetoid" position="16 0 0" scale=".09 .09 .09"  material="src: #venusmap" onmouseenter="visImg(2);" onmouseleave="startInterval(2);"></a-entity>
+        </a-entity>
+        <a-entity mixin="orbit" animation="delay: 9000">
+            <a-entity id="earth" class="clickable" mixin="planetoid orbit spin" position="24 0 0" scale=".1 .1 .1"  onmouseenter="visImg(3);" onmouseleave="startInterval(3);"  material="src: #earthmap">
+                <a-entity id="moon" class="clickable" mixin="planetoid" position="24.1 0 0" scale=".07 .07 .07" onmouseenter="visImg(3);" onmouseleave="startInterval(3);"  material="src: #moonmap"></a-entity>
+            </a-entity>
+        </a-entity>
+        <a-entity mixin="orbit" animation="delay: 15000">
+            <a-entity id="mars" class="clickable" mixin="planetoid" position="32 0 0" scale=".05 .05 .05" onmouseenter="visImg(4);" onmouseleave="startInterval(4);"  material="src: #marsmap"></a-entity>
+        </a-entity>
+        <!-- Jupiter! This humongous gas giant rotates faster than any other planet in the Solar System, completing a day in less than 10 hours! -->
+        <a-entity mixin="orbit" animation="delay: 20000">
+            <a-entity id="jupiter" class="clickable" mixin="planetoid spin" position="40 0 0" scale="1.2 1.2 1.2" onmouseenter="visImg(5);" onmouseleave="startInterval(5);"  material="src: #jupitermap"></a-entity>
+        </a-entity>
+        <a-entity mixin="orbit" animation="delay: 26000">
+            <a-entity id="saturn" class="clickable" mixin="planetoid spin" position="48 0 0" scale="1.0 1.0 1.0" onmouseenter="visImg(6);" onmouseleave="startInterval(6);"  material="src: #saturnmap"></a-entity>
+            <!-- Textured circle of Saturn's Rings -->
+            <a-circle src="#saturnRings" class="clickable" radius="50" rotation="-65.3 -81.8 81.8" position="48 0 0" scale="0.09 0.09 0.09" onmouseenter="visImg(6);" onmouseleave="startInterval(6);" material="transparent: true"></a-circle>
+        </a-entity>
+        <a-entity mixin="orbit" animation="delay: 32000">
+            <a-entity id="uranus" class="clickable" mixin="planetoid" position="56 0 0" scale=".5 .5 .5" onmouseenter="visImg(7);" onmouseleave="startInterval(7);"  material="src: #uranusmap"></a-entity>
+        </a-entity>
+        <a-entity mixin="orbit" animation="delay: 48000">
+            <a-entity id="neptune" class="clickable" mixin="planetoid spin" position="64 0 0" scale=".4 .4 .4" onmouseenter="visImg(8);" onmouseleave="startInterval(8);"  material="src: #neptunemap"></a-entity>
+        </a-entity>
+        <!-- NPC The nav-agent component adds behaviors to the NPC entity, like speed.  We need to move faster because everything else is moving as well-->
+        <a-entity id="npc" nav-agent="speed: 2.5"></a-entity>
+        <!-- Basic movement, selection and teleportation  -->
+        <a-entity id="cameraRig" movement-controls="constrainToNavMesh: false;" navigator="cameraRig: #cameraRig; cameraHead: #head; collisionEntities: .collision; ignoreEntities: .clickable" position="0 0 0" rotation="0 0 0">
+        <!-- camera -->
+        <a-entity id="head" camera="active: true" position="0 0 275" user-height="0" look-controls="pointerLockEnabled: true; reverseMouseDrag: true" animation__position="property: position;
+                                         dur: 40000;
+                                         from: 0 10 275;
+                                         to: 0 0 27;
+                                         easing: easeInOutSine;
+                                         loop: false;
+                                         direction: reverseAlternate" ></a-entity>
+              <!-- Left Controller  -->
+              <a-entity class="leftController" hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" teleport-controls="cameraRig: #cameraRig; teleportOrigin: #head; button: trigger; curveShootingSpeed: 18; landingMaxAngle: 60; type: line" visible="true">
+                
+                              <!-- Popup 2D images of "Planetary Information" -->
+                              <a-plane id="2Dimg0" mixin="pInfo" material="src: #img0"></a-plane>
+                              <a-plane id="2Dimg1" mixin="pInfo" material="src: #img1"></a-plane>
+                              <a-plane id="2Dimg2" mixin="pInfo" material="src: #img2"></a-plane>
+                              <a-plane id="2Dimg3" mixin="pInfo" material="src: #img3"></a-plane>
+                              <a-plane id="2Dimg4" mixin="pInfo" material="src: #img4"></a-plane>
+                              <a-plane id="2Dimg5" mixin="pInfo" material="src: #img5"></a-plane>
+                              <a-plane id="2Dimg6" mixin="pInfo" material="src: #img6"></a-plane>
+                              <a-plane id="2Dimg7" mixin="pInfo" material="src: #img7"></a-plane>
+                              <a-plane id="2Dimg8" mixin="pInfo" material="src: #img8"></a-plane>
+              </a-entity>
+              <!-- Right Controller  -->
+              <a-entity class="rightController" hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;" line="color: lawngreen; opacity: 0.5" visible="true"></a-entity>
+        </a-entity>
+    </a-scene>
+</body>
+</html>
