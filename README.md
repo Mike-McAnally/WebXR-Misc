@@ -21,7 +21,7 @@ https://michael-mcanally.medium.com/a-parade-of-planets-in-vr-1aa5e56f39d6
 
 ---------------
 
-Space Carousel Game
+Space Carousel Game - with nice song licensed. Replace with your own song.
 https://rocketvirtual.com/aframePACKAGE/Space_Carousel2.html
 
 ---------------
@@ -33,9 +33,9 @@ Article
 https://michael-mcanally.medium.com/multi-user-vr-office-space-using-a-frame-and-naf-cab1409800ce
 
 ---------------
+Be My Valentine VR Card Game - with nice song licensed. Replace with your own song.
 
-
-
+https://rocketvirtual.com/aframePACKAGE/NewBeMyValentineCard2.html
 
 ---------------
 
