@@ -67,7 +67,7 @@ https://michael-mcanally.medium.com/vr-galleries-nfts-metaverse-70dd573058ce
 
 ---------------
 
-VR Island Art Complex -IMPORTANT: Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only.
+VR Island Art Complex -IMPORTANT: Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only.  Uses Networked-Aframe for multi-user VR social experience.
 
 https://funbit64.com:3025/IslandComplex.html
 
