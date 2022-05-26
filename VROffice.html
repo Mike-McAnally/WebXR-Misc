@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>VR Office -long graphics download. please wait. Arrow keys move, left mouse button drag rotates view, ESC key recovers mouse pointer.</title>
+    <meta name="description" content="Virtual Reality Office Space">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <script src="https://rocketvirtual.com/aframePACKAGE/a-frame1.1.9THREEr124c/dist/aframe-master.min.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/aframe-environment-component-master/dist/aframe-environment-component.min.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/aframe-extras-master/dist/aframe-extras.min.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/aframe-teleport-controls-master/dist/aframe-teleport-controls.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/superframe-master/components/thumb-controls/dist/aframe-thumb-controls-component.min.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/aframe-lensflare-component-master/dist/aframe-lensflare-component.min.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/superframe-master/components/text-geometry/dist/aframe-text-geometry-component.min.js"></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/aframe-alongpath-component-master/dist/aframe-alongpath-component.min.js" ></script>
+    <script src="https://rocketvirtual.com/aframePACKAGE/aframe-curve-component-master/dist/aframe-curve-component.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+
+    <!-- Video Player Styling -->
+    <style type="text/css">
+      #video-permission {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: white;
+          z-index: 10000;
+          display: none;
+      }
+      #video-permission-button {
+        position: fixed;
+        top: calc(50% - 1em);
+        left: calc(50% - 60px);
+        width: 120px;
+        height: 2em;
+      }
+    </style>
+
+    <!-- The JavaScript below provides for selection and action on objects, environment and audio -->
+    <script type="text/javascript">
+
+      // Audio squawk for the duck
+      var squawk = new Audio('https://rocketvirtual.com/aframePACKAGE/assets/mp3/duck.mp3');
+
+      // Function to execute onclick
+      function fire_laser() {
+
+        // Make Duck Quack sound
+        squawk.play();
+
+        //Disappear Duck
+        document.getElementById('movingDuck').setAttribute('visible', 'false');
+      }
+
+
+      function doCylinder() {
+        
+        // Bring back visibility of Duck and Cube, turn Sphere red again
+        document.getElementById('movingDuck').setAttribute('visible', true);
+        document.getElementById('cube').setAttribute('visible', true);
+        document.getElementById('sphere').setAttribute('color', 'red');
+      }
+
+
+      function doCube() {
+        
+        // Make Sphere green, disappear Cube for now
+        document.getElementById('sphere').setAttribute('color', 'green');
+        document.getElementById('cube').setAttribute('visible', false);      
+      }
+
+
+      // Component to do on click.
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+
+            this.el.addEventListener('click', function (evt) {
+
+                // remove clicked object from view
+                //this.setAttribute('visible', false);
+      
+            });
+        }
+      });
+
+
+      //   Solves Google Chrome mute of audio https://stackoverflow.com/questions/47921013/play-sound-on-click-in-a-frame?answertab=active#tab-top
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+
+                if(!playing) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                playing = !playing;
+            });
+        }
+      })
+
+
+// for immersive navigation for "when" all the browsers support in WebXR
+
+AFRAME.registerComponent('navigate', {
+  schema: {url: {default: ''}},
+  init: function () {
+    var data = this.data;
+    this.el.addEventListener('click', function () {
+      window.location = data.url;
+    });
+  }
+});
+
+
+
+AFRAME.registerComponent('info-message', {
+  schema: {
+    htmlSrc: {type: 'selector'}
+  },
+  init: function () {
+    var sceneEl = this.el.sceneEl;
+    var messageEl = this.messageEl = document.createElement('div');
+    messageEl.classList.add('a-info-message');
+    sceneEl.setAttribute('aframe-injected', '');
+
+    var closeButtonEl = this.closeButtonEl = document.createElement('button');
+    closeButtonEl.innerHTML = 'X';
+    closeButtonEl.classList.add('a-close-button-info');
+    closeButtonEl.onclick = function () { messageEl.style.display = 'none'; };
+
+    this.addStyles();
+    sceneEl.appendChild(messageEl);
+  },
+  update: function () {
+    var messageEl = this.messageEl;
+    messageEl.innerHTML = this.data.htmlSrc.data;
+    messageEl.appendChild(this.closeButtonEl);
+  },
+  addStyles: function () {
+    var css =
+      '.a-info-message{border-radius: 10px; position: absolute; width: 400px;' +
+      'height: 250px; background-color: white; border: 3px solid rgba(0,0,0,.75);' +
+      'bottom: 22px; left: 22px; color: rgb(51, 51, 51); padding: 20px 15px 0 15px;' +
+      'font-size: 12pt; line-height: 20pt;}' +
+
+      '.a-info-message a{border-bottom: 1px solid rgba(53,196,232,.15); color: #1497b8;' +
+      'position: relative; text-decoration: none; transition: .05s ease;}' +
+
+      '@media only screen and (max-width: 600px) {' +
+      '.a-info-message {left: 20px; right: 20px; bottom: 60px; width: auto}}' +
+
+      '.a-close-button-info{width: 25px; height: 25px; padding: 0;' +
+      'top: 10px; right: 10px; position: absolute; color: white;' +
+      'font-size: 12px; line-height: 12px; border: none; background-color: #ef2d5e;' +
+      'border-radius: 5px; font-weight: medium}' +
+
+      '.a-close-button-info:hover{background-color: #b32146; color: white}';
+    var style = document.createElement('style');
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
+  }
+});
+    </script>
+
+
+
+  </head>
+  <body>
+    <div id="video-permission">
+    <button id="video-permission-button">Allow VR Video</button>
+    </div>
+    <button id="playButton" type="button">Play Music</button>
+    <audio id="playAudio" autoplay loop>
+        <!-- <source src="https://rocketvirtual.com/A-Frame_WebXR/assets/mp3/Romanzeandante.mp3" type="audio/mpeg"> -->
+    </audio>
+    <a-scene networked-scene="
+      room: VROffice;
+      debug: true;
+      adapter: easyrtc;
+      audio: true;
+    " info-message="htmlSrc: #messageText"> 
+      <a-assets>
+        <a-asset-item id="messageText" src="ControlsMessage.html" response-type="text"></a-asset-item>
+        <!-- Our font -->
+        <a-asset-item id="optimerBoldFont" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+        <img crossorigin="anonymous" id="flare-asset" src="assets/img/adjustflare.jpg">
+
+        <a-asset-item id="Building" src="assets/gltf/New_Building_final1.glb" nav-agent="speed: 1.5; active: true"></a-asset-item>
+        <a-asset-item id="Building_skeleton" src="assets/gltf/New_Building_final_skeleton1.glb"></a-asset-item>
+
+        <a-asset-item id="Robot2" src="assets/gltf/robot_green.glb"></a-asset-item>
+        <a-asset-item id="Robot4" src="assets/gltf/robot_purple.glb"></a-asset-item>
+        <a-asset-item id="Robot5" src="assets/gltf/robot_red.glb"></a-asset-item>
+        <a-asset-item id="RobotHead" src="assets/gltf/robot_face.glb"></a-asset-item>
+        <a-asset-item id="Robot6" src="assets/gltf/robot_white.glb"></a-asset-item>
+
+        <a-asset-item id="SwivelChair" src="assets/gltf/chair4.glb"></a-asset-item>
+        <a-asset-item id="Table1" src="assets/gltf/Table_curved_legs.glb"></a-asset-item>
+        <a-asset-item id="Computer_Desk1" src="assets/gltf/computer_Desk.glb"></a-asset-item>
+        <a-asset-item id="Shelf3" src="assets/gltf/shelf4.glb"></a-asset-item>
+
+        <a-asset-item id="LHand" src="assets/gltf/leftHandLow.glb"></a-asset-item>
+        <a-asset-item id="RHand" src="assets/gltf/rightHandLow.glb"></a-asset-item>
+
+        <a-asset-item id="Rocket" src="assets/gltf/rocket4.glb"></a-asset-item>
+        <a-asset-item id="Saucer" src="assets/gltf/FlyingSaucer/fsaucer.glb"></a-asset-item>
+        <a-asset-item id="Raygun" src="assets/gltf/raygun4/raygun.glb"></a-asset-item>
+
+        <a-asset-item id="Grey" src="assets/gltf/alienLite.glb"></a-asset-item>
+
+        <img crossorigin="anonymous" src="assets/img/play2.png" id="play" >
+        <img crossorigin="anonymous" src="assets/img/pause.png" id="pause" >
+        <img crossorigin="anonymous" src="assets/img/volume-normal.png" id="volume-normal" >
+        <img crossorigin="anonymous" src="assets/img/volume-mute.png" id="volume-mute" >
+        <img crossorigin="anonymous" src="assets/img/seek-back.png" id="seek-back" >
+
+        <!-- Duck 3D GltF model  -->
+        <a-asset-item id="duck" src="assets/gltf/Duck.glb"></a-asset-item>
+        
+        <template id="avatar-template">
+          <a-entity networked-audio-source></a-entity>
+        </template>
+        
+        <template id="head-template">
+          <a-entity class="cam" gltf-model="#RobotHead" scale="0.008 0.008 0.008"></a-entity>
+        </template>
+        
+        <template id="hand-left">
+          <a-entity class="leftController">
+            <!-- <a-box class="box" scale="0.1 0.1 0.1"></a-box>  -->
+            <a-entity gltf-model="#LHand" ></a-entity>
+          </a-entity>
+        </template>
+
+        <template id="hand-right">
+          <a-entity class="rightController">
+            <!-- <a-box class="box" scale="0.1 0.1 0.1"></a-box>  -->
+            <a-entity gltf-model="#RHand" ></a-entity>
+          </a-entity>
+        </template>
+
+        <video crossorigin="anonymous" id="video-src" src="assets/video/Vlog.mp4"></video>
+
+        <img crossorigin="anonymous" id="artwork1" src="assets/img/meetingComplexArtISLAND.jpg">
+        <img crossorigin="anonymous" id="artwork2" src="assets/img/NewIslandComplex.jpg">
+
+        <a-asset-item crossorigin="anonymous" id="Palm" src="assets/gltf/PalmMinimal.glb"></a-asset-item>
+
+
+      </a-assets>
+
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+
+      <!-- nav-mesh: protecting us from running thru walls  -->
+      <a-entity id="navmesh-walls" gltf-model="assets/gltf/navmeshOffice.gltf" visible="false" nav-mesh=""></a-entity>
+
+      <!-- Basic movement, selection and teleport -->
+      <a-entity id="avatar" networked="template:#avatar-template;attachTemplateToLocal:false;"
+        movement-controls="constrainToNavMesh: true;" spawn-in-circle="radius:3">
+        <a-entity class="cam" networked="template:#head-template;attachTemplateToLocal:false;" camera="active: true"
+          position="0 1.6 0" look-controls></a-entity>
+        <a-entity class="leftController" networked="template:#hand-left;attachTemplateToLocal:false;"
+          hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" teleport-controls="cameraRig: #avatar; teleportOrigin: #cam; button: trigger; type: line; curveShootingSpeed: 10; collisionEntities: #navmesh-walls; landingMaxAngle: 60" visible="true" ></a-entity>
+        <a-entity class="rightController" networked="template:#hand-right;attachTemplateToLocal:false;"
+          hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;" line="color: #7cfc00; opacity: 0.5" visible="true"></a-entity>
+      </a-entity>
+
+
+      <a-entity id="Meeting_Structure" gltf-model="#Building" position="-10 0.01 12" rotation="0 0 0" scale="0.019 0.019 0.019" shadow=""></a-entity>
+
+      <a-entity id="Meeting_Structure_skeleton" gltf-model="#Building_skeleton" position="5.06328 0.82952 -7.72371" rotation="0 0 0" scale="0.0005 0.0005 0.0005" shadow=""></a-entity>
+
+      <a-box id="ramp" position="0.98334 2.29677 17.7" rotation="-67.55516179269485 0.3609634109324186 -0.21314029978866625" scale="1 3.75116 0.11246" width="4" height="4" color="#FFFFFF" shadow="receive: true"></a-box>
+
+      <a-box id="building patch" position="1.62148 4.939 -10.96095" rotation="-90 0 90" scale="0.009 3.58119 0.1" width="4" height="4" color="#3C4F4B" shadow="" material="" geometry=""></a-box>
+
+      <!-- Some 3D Text -->
+      <a-entity position="1.84183 1.46367 -4.25854" rotation="0 90 0" text-geometry="value: Rocket Virtual; font: #optimerBoldFont" scale=".3 .3 1" material="color: #FFFFFF"></a-entity>
+
+      <a-entity position="5.44002 0.83589 -8.18475" rotation="-90.004 -2 90" text-geometry="value: You are here; font: assets/fonts/optimer_bold.typeface.json" scale="0.03 0.03 0.05" material="color: #98BE9C"></a-entity>
+
+      <a-entity position="-1.97251 0.49353 -3.58339" text-geometry="value: Sample video player; font: #optimerBoldFont" scale=".2 .2 .2" material="color: #98BE9C"></a-entity>
+
+      <!-- Place the Sun -->
+      <a-sphere id="flare" radius="0.05" color="yellow" lensflare="createLight:false; relative: true; src: #flare-asset; position:-109.093 10.428 -46.857; lightColor:yellow; intensity: 5; lightDecay: 500" position="-109.093 26.20844 -14.03708"></a-sphere>
+
+      <!-- Our Environment -->
+      <a-entity environment="preset: forest; playArea: 1.2; dressingAmount: 250; dressingUniformScale: true; dressingColor: #248728; ground: hills; groundTexture: none; groundColor: #34711C; groundColor2: #319D06; grid: none; gridColor: #81F995; skyType: gradient; skyColor: #A4CFFA; horizonColor: #95C8FA; fog: .75" shadow></a-entity>
+
+      <a-entity light="type: ambient; intensity: 0.45"></a-entity>
+
+      <!-- A light in the scene casting shadows -->
+      <a-entity light="intensity: 0.5; castShadow: true; shadowCameraLeft: -50; shadowCameraBottom: -50; shadowCameraRight: 50; shadowCameraTop: 50; shadowCameraVisible: false" position="-85.28485 65.36529 -12.29375"></a-entity>
+
+      <!-- Normal Hello World objects modified to respond to onclick and audio   -->
+      <a-box id="cube" class="clickable" position="-1 5.79285 -3" rotation="0 45 0" color="#4CC3D9" visible="true" shadow  onclick="doCube();" click-listener></a-box>
+      <a-sphere id="sphere" class="clickable" position="0 6.51879 -5" radius="1.25" color="#EF2D5E" shadow audiohandler></a-sphere>
+      <a-cylinder id="cylinder" class="clickable" position="1 6.01832 -3" radius="0.5" height="1.5" color="#FFC65D" shadow onclick="doCylinder();" click-listener></a-cylinder>
+
+      <!-- Moving Duck  -->
+      <a-entity id="movingDuck" class="clickable" gltf-model="#duck" alongpath="curve:#track;loop:true;dur:14000;rotate:true" position="0 1.6 -5" shadow="receive:false" scale="1 1 1" animation__rotate="property: rotation; dur: 2000; easing: linear; loop: true; to: 0 360 0" shadow onclick="fire_laser();" cursor-listener></a-entity>
+
+      <!-- A track for our Duck to follow  -->
+      <a-curve id="track" >
+        <a-curve-point position="0 6 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 6 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="7 6 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 6 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 6 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 6 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-8 6 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 6 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 6 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+      </a-curve> 
+
+      <!-- The track line in red  -->
+      <a-draw-curve curveref="#track" material="shader: line; color: red;" visible="false"></a-draw-curve> 
+
+      <!-- Office Furniture -->
+      <a-entity id="Office_Swivel_Chair1" gltf-model="#SwivelChair" position="-4.50984 1.4088 -7.49469" rotation="0 51.53067817847597 0" scale="0.014 0.014 0.014" shadow visible=""></a-entity>
+      <a-entity id="Office_Swivel_Chair2" gltf-model="#SwivelChair" position="-1.08802 1.4088 -7.49469" rotation="0 -77.14704824097996 0" scale="0.014 0.014 0.014" shadow="" visible=""></a-entity>
+
+      <a-entity id="Office_Swivel_Chair3" gltf-model="assets/gltf/chair4.glb" position="-1.87096 1.4088 -9.64701" rotation="0 -33.77643498075716 0" scale="0.014 0.014 0.014" shadow="" visible=""></a-entity>
+  
+      <a-entity id="Computer_Desk" gltf-model="#Computer_Desk1" position="-3.53831 0.00717 -7.49088" rotation="0 -89.90223467618235 0" scale="0.013 0.013 0.013" shadow visible=""></a-entity>
+      <a-entity id="Shelf3" gltf-model="#Shelf3" position="-1.38896 -0.07179 -4.27878" rotation="0 -180 0" scale="0.003 0.003 0.003" shadow visible=""></a-entity>
+
+      <a-entity id="Table" gltf-model="assets/gltf/Table_curved_legs.glb" position="5.34578 0.02888 -8.04148" rotation="0 -180 0" scale="0.001 0.001 0.001" shadow="" visible=""></a-entity>
+
+      <a-plane id="artworkPosition1" class="clickable" position="5.34826 2.32653 -10.91675" scale="3.00012 1.60238 1" rotation="-0.040107045659157625 -0.10485127650894065 0.09912169855763242" material="src: #artwork1; color: white; transparent: true" geometry="" navigate="url: https://funbit64.com/node/2"></a-plane>
+
+      <a-plane id="artworkPosition2" class="clickable" position="-5.30594 2.32648 -7.751" scale="2 1.5 1" rotation="-0.040107045659157625 89.948 0.09912169855763242" material="src: #artwork2; color: white; transparent: true" geometry="" navigate="url: https://funbit64.com/node/2"></a-plane>
+
+      <!-- Robots Sample Only (no video face plate) -->
+      <a-entity id="Robot Green" gltf-model="#Robot2" position="-2.6114 1.18304 -7.26037" rotation="0 118.3885503344966 0" scale="0.003 0.003 0.003" shadow visible=""></a-entity>
+
+      <a-entity id="Horse Model" gltf-model="assets/gltf/Horse_Free.glb" position="-32.48962 -0.00726 -5.51635" rotation="0 -29.66947350525942 0" scale="" shadow="" visible=""></a-entity>
+
+      <a-entity id="Trex Model" gltf-model="assets/gltf/Trex_base_mesh.glb" position="-18.37552 3.72096 -21.78617" rotation="0 -53.44321129862267 0" scale="1.8 1.8 1.8" shadow="" visible=""></a-entity>
+
+      <a-entity id="Tri Model" gltf-model="assets/gltf/Triceratops_base_mesh.glb" position="-24.36163 1.309 18.52896" rotation="0 105.51246980452161 0" scale="0.4 0.4 0.4" shadow="" visible=""></a-entity>
+
+      <!-- Palm Trees These are a little heavy, but they really look nice...
+      <a-entity id="Palm_Tree1" gltf-model="#Palm" position="-60.19575 -0.18477 -20.35598" rotation="0 0 0" scale=".002 .004 .002" shadow></a-entity>
+      <a-entity id="Palm_Tree2" gltf-model="#Palm" position="9.00534 -0.76341 -16.69816" rotation="-11.130278128211371 115.2934323251999 -2.7719698128429227" scale="0.002 0.004 0.002" shadow></a-entity>
+      <a-entity id="Palm_Tree3" gltf-model="#Palm" position="9.74856 -0.1212 14.78727" rotation="-6.868045090233179 61.74422383447803 5.194435370656044" scale=".002 .003 .002" shadow></a-entity>
+      <a-entity id="Palm_Tree4" gltf-model="#Palm" position="-29.31117 -0.40163 0.262" rotation="0 78.26 0" scale=".002 .004 .002" shadow></a-entity>        -->
+
+
+      <a-entity id="Robot Purple" gltf-model="#Robot4" position="-2.6114 1.18304 -6.8313" rotation="0 89.96239524467109 0" scale="0.003 0.003 0.003" shadow visible=""></a-entity>
+      <a-entity id="Robot Red" gltf-model="#Robot5" position="-2.6114 1.18304 -7.68767" rotation="0 56.14012364030345 0" scale=".003 .003 .003" shadow visible=""></a-entity>
+      <a-entity id="Robot Large" gltf-model="#Robot6" position="-2.01922 1.69978 -4.35856" rotation="0 177.29835195646245 0" scale="0.007 0.007 0.007" shadow visible=""></a-entity>
+      <a-entity id="Flying Saucer" gltf-model="#Saucer" position="19.11134 -14.69214 -6.62685" rotation="34.226206849934854 16.358518008780134 2.398401330417626" scale="14 14 14" shadow visible=""></a-entity>
+
+<!-- Aliens too much for Oculus Quest 2
+
+      <a-entity id="Alien1" gltf-model="#Grey" position="28.79104 0.09554 0.73935" rotation="-86.72862144895271 -165.37395432419976 72.53187320120117" scale="2 2 2" shadow visible=""></a-entity>  -->
+      <a-entity id="Alien2" gltf-model="#Grey" position="28.79104 0.09554 0.10508" rotation="-59.668970700514194 -2.4362165448962605 -4.379689385980012" scale="2 2 2" shadow visible=""></a-entity>
+<!-- Aliens too much for Oculus Quest 2
+      
+      <a-entity id="Alien3" gltf-model="#Grey" position="27.52101 0.19413 0.394" rotation="87.90604971794654 120.32400176644853 152.1930602472152" scale="2 2 2" shadow visible=""></a-entity>  -->
+      <a-entity id="Large Rocket" gltf-model="#Rocket" position="1.23904 3.01167 -3.92876" rotation="-31.88395538344005 -12.176499062120255 -70.1380555331446" scale="0.5 0.5 0.5" shadow visible=""></a-entity>
+
+      <a-entity id="Shoot Raygun" gltf-model="#Raygun" position="-0.72989 1.18823 -4.46382" rotation="77.82714914380024 0 0" scale="0.2 0.195 0.195" shadow visible=""></a-entity>
+
+      <!-- Controls for display of video screen, seems to work nicely, javascript below </scene> tag below -->
+     
+          <!-- MEDIAS HOLDER -->
+          <a-sound id="alert-sound" src="src: url(assets/wav/action.wav)" autoplay="false" position="0 0 0"></a-sound>
+          <a-video id="video-screen" src="#video-src" position="-0.02132 1.89195 -3.56798" rotation="0 0 0" scale="0.50761 0.49394 1" width="8" height="4" rotation="0 0 0" visible="true"></a-video>
+          <!-- END MEDIAS HOLDER -->
+
+          <!-- CONTROLS -->
+          <a-image class="clickable" id="control-back" width="0.4" height="0.4" src="#seek-back" position="-0.42425 0.565 -3.47602" rotation="0 1.2570694025170261 0" visible="false" scale="0.85 0.85 0.85"></a-image>
+          <a-image class="clickable" id="control-play" width="0.4" height="0.4" src="#play" position="-0.00457 0.565 -3.47602" rotation="0 1.2570694025170261 0"></a-image>
+          <a-image class="clickable" id="control-volume" width="0.4" height="0.4" src="#volume-mute" position="0.38786 0.565 -3.47602" rotation="0 1.2570694025170261 0" visible="false" scale="0.75 0.75 0.75"></a-image>
+          <!-- END CONTROLS -->
+
+          <!-- PROGRESSBAR -->
+          <a-entity id="progress-bar" geometry="primitive:plane;height:0.1;width:4" material="opacity:0;transparent:true;visible:false" position="-0.00457 0.835 -3.47602" rotation="0 1.2570694025170261 0" >
+            <a-plane id="progress-bar-track" width="4" height="0.1" color="gray" position="" opacity="0.2" material="" visible="false" geometry=""></a-plane>
+            <a-plane id="progress-bar-fill" width="2.496982785433659" height="0.1" color="#7198e5" position="-0.7515086072831705 0 0" geometry="" visible="false" material=""></a-plane>
+          <!-- END PROGRESSBAR -->
+    
+    </a-scene>
+
+    <script>
+      /**
+       * NAF Setup
+       */
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#head-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-left',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-right',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      function onConnect() {
+        console.log("connected to a room!");
+      }
+
+//Google Code for un-audio mute
+// Existing code unchanged.
+window.onload = function() {
+  var context = new AudioContext();
+  // Setup all nodes
+
+}
+
+// One-liner to resume playback when user interacted with the page.
+document.querySelector('button').addEventListener('click', function() {
+  context.resume().then(() => {
+    console.log('Playback resumed successfully');
+  });
+});
+    
+      var AVideoPlayer = function() {
+      // Vals
+      this.duration         = 0;
+      this.current_progress = 0;
+      this.progressWidth    = 4;
+      this.paused           = true;
+      // Elems
+      this.elProgressBar   = null;
+      this.elProgressTrack = null;
+      this.elProgressFill  = null;
+      this.elAlertSound    = null;
+      this.elVideo         = null;
+      this.elVideoScreen   = null;
+      this.elControlBack   = null;
+      this.elControlPlay   = null;
+      this.elControlVolume = null;
+      this._initElements = function() {
+        this.elProgressBar   = document.getElementById('progress-bar');
+        this.elProgressTrack = document.getElementById('progress-bar-track');
+        this.elProgressFill  = document.getElementById('progress-bar-fill');
+        this.elAlertSound    = document.getElementById('alert-sound');
+        this.elVideo         = document.getElementById('video-src');
+        this.elVideoScreen   = document.getElementById('video-screen');
+        this.elControlBack   = document.getElementById('control-back');
+        this.elControlPlay   = document.getElementById('control-play');
+        this.elControlVolume = document.getElementById('control-volume');
+      }
+      /**
+      * PROGRESS
+      */
+      this.setProgress = function(progress) {
+        var new_progress = this.progressWidth*progress;
+        this._setProgressWidth(new_progress);
+        var progress_coord = this._getProgressCoord();
+        if (progress_coord != undefined) {
+         progress_coord.x = -(this.progressWidth-new_progress)/2;
+         this._setProgressCoord(progress_coord);
+        }
+      }
+      this._getProgressCoord = function() {
+        return AFRAME.utils.coordinates.parse(this.elProgressFill.getAttribute("position"))
+      }
+      this._getProgressWidth = function() {
+        return parseFloat(this.elProgressFill.getAttribute("width"));
+      }
+      this._setProgressCoord = function(coord) {
+        this.elProgressFill.setAttribute("position", coord);
+      }
+      this._setProgressWidth = function(width) {
+        this.elProgressFill.setAttribute("width", width);
+      }
+      /*
+      * UI SETTERS
+      */
+      this.isProgressBarVisible = function(isVisible) {
+        this.elProgressTrack.setAttribute("visible", isVisible);
+        this.elProgressFill.setAttribute("visible", isVisible);
+      }
+      this.isControlVisible = function(isVisible) {
+        this.elControlBack.setAttribute("visible", isVisible);
+        this.elControlVolume.setAttribute("visible", isVisible);
+        this.elVideoScreen.setAttribute("visible", isVisible);
+      }
+      /*
+      * EVENTS
+      */
+      this._addPlayerEvents = function() {
+        var that = this;
+        this.elVideo.pause();
+        this.elVideo.onplay = function() {
+          that.duration = this.duration;
+        }
+        this.elVideo.ontimeupdate = function() {
+          if (that.duration > 0) {
+            that.current_progress = this.currentTime/that.duration;
+          }
+          that.setProgress(that.current_progress);
+        }
+      }
+      this._addControlsEvent = function() {
+        var that = this;
+        this.elControlPlay.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.paused) {
+            this.setAttribute('src', '#pause');
+            that.elVideo.play();
+            that.paused = false;
+            that.isProgressBarVisible(true);
+            that.isControlVisible(true);
+          } else {
+            this.setAttribute('src', '#play');
+            that.elVideo.pause();
+            that.paused = true;
+            that.isProgressBarVisible(false);
+            that.isControlVisible(false);
+         }
+        });
+        this.elControlVolume.addEventListener('click', function () {
+          that._playAudioAlert();
+          if (that.elVideo.muted) {
+            that.elVideo.muted = false;
+            this.setAttribute('src', '#volume-normal');
+          } else {
+            that.elVideo.muted = true;
+            this.setAttribute('src', '#volume-mute');
+          }
+        });
+        this.elControlBack.addEventListener('click', function () {
+          that._playAudioAlert();
+          that.elVideo.currentTime = 0;
+        });
+      }
+      this._addProgressEvent = function() {
+        var that = this;
+        this.elProgressBar.addEventListener('click', function (e) {
+          if (e.detail == undefined || e.detail.intersection == undefined || that.duration === 0) {
+            return;
+          }
+          let seekedPosition = (e.detail.intersection.point.x+(that.progressWidth/2))/that.progressWidth;
+          try {
+            let seekedTime = seekedPosition*that.duration;
+            that.elVideo.currentTime = seekedTime;
+          } catch (e) {
+          }
+        });
+      }
+      this._playAudioAlert = function() {
+        if (this.elAlertSound.components !== undefined && this.elAlertSound.components.sound !== undefined) {
+         this.elAlertSound.components.sound.playSound();
+        }
+      }
+      /**
+      * MOBILE PATCH TO PLAY VIDEO
+      */
+      this._mobileFriendly = function() {
+        if (AFRAME.utils.device.isMobile()) {
+          var that = this;
+          let video_permission        = document.getElementById('video-permission');
+         let video_permission_button = document.getElementById('video-permission-button');
+          video_permission.style.display = 'block';
+          video_permission_button.addEventListener("click", function() {
+            video_permission.style.display = 'none';
+            that.elVideo.play();
+            that.elVideo.pause();
+          }, false);
+        }
+      }
+      this.init = function() {
+        this._initElements();
+        //this._determinateProgressWidth();
+        this.setProgress(this.current_progress);
+        this._addPlayerEvents();
+        this._addControlsEvent();
+        this._addProgressEvent();
+        this._mobileFriendly();
+      }
+      this.init();
+    }
+      let scene = document.querySelector('a-scene');
+      var cursor = document.querySelector('a-cursor');
+      /**
+      * CINEMA MODE
+      */
+      scene.lightOff = function() {
+        scene.islightOn = true;
+        scene.removeAttribute('animation__fogback');
+        scene.setAttribute('animation__fog', "property: fog.color; to: #0c192a; dur: 800; easing: easeInQuad;");
+      }
+      scene.lightOn = function() {
+        scene.islightOn = false;
+        scene.removeAttribute('animation__fog');
+        scene.setAttribute('animation__fogback', "property: fog.color; to: #dbdedb; dur: 800");
+      }
+      /**
+      * AVideoPlayer
+      */
+      var videoPlayer = new AVideoPlayer();
+      document.querySelector('#control-play').addEventListener('click', function () {
+        if (videoPlayer.paused) {
+          scene.lightOn()
+        } else {
+          scene.lightOff();
+        }
+      });
+    </script>
+  </body>
+</html>
