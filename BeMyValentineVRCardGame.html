@@ -1,0 +1,463 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Valentine VR-Card Game</title>
+    <meta name="description" content="A Valentines Day virtual reality greeting card game. Coded and Created By Michael McAnally, January 29, 2019.  Credit to Be My Valentine song by Tim McMorris puchase license, standard 10K AudioJungle"></meta>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+
+    <!-- A-frame component libraries, look them up on Github -->
+    <script src="aframe-master/dist/aframe-v1.1.0.min.js"></script>
+    <script src="aframe-extras-master/dist/aframe-extras.min.js"></script>
+    <script src="aframe-environment-component-master/dist/aframe-environment-component.min.js"></script>
+    <script src="superframe-master/components/thumb-controls/dist/aframe-thumb-controls-component.min.js"></script>
+<!-- Removed teleport for now    <script src="aframe-teleport-controls-master/dist/aframe-teleport-controls.js"></script>   -->
+    <script src="superframe-master/components/text-geometry/dist/aframe-text-geometry-component.min.js"></script>
+    <script src="aframe-alongpath-component-master/dist/aframe-alongpath-component.min.js" ></script>
+    <script src="aframe-curve-component-master/dist/aframe-curve-component.min.js"></script>
+<!-- Removed lensflare for now       <script src="aframe-lensflare-component-master/dist/aframe-lensflare-component.min.js"></script>  -->
+<!-- Add rotating advertisement  -->
+    <script src="aframe-multisrc-component-master/dist/0.3/aframe-multisrc-component.js"></script>
+
+    <script type="text/javascript">
+var numberOfArrayDimension = 8; 
+var playMusicSpeed = 1;
+var rotation_speed = 15500;
+var planets = ["yavapai", "forest", "goaland", "dream"];
+var m = 1;  
+var k = 21;
+var indexElement = 0;
+var counttx = 0, countup = true;
+var nIntervId;
+var audio2 = new Audio('https://rocketvirtual.com/aframePACKAGE/assets/mp3/magical_sparkle.mp3');
+function startPoints() {
+    nIntervId = setInterval(fadePoints, 400);
+}
+function fadePoints()
+{
+  if (countup)
+  {
+    counttx = counttx + .10;
+    if (counttx >= 1)
+      countup = false;
+  }
+  else
+  {
+    counttx = counttx - .10;
+    if (counttx <= 0)
+      countup = true;
+  }
+  document.getElementById('Points').setAttribute('material', 'opacity: ' + counttx.toString());
+}
+function stopPoints() {
+      document.getElementById('Points').setAttribute('material', 'opacity: 0');
+      clearInterval(nIntervId);
+}
+function changePlanet() {
+    m = m + 1;
+    if (m > planets.length)  { 
+        m = 0;
+    }
+    document.getElementById('onplanet').setAttribute('environment', 'preset: ' + planets[m]);
+}
+function shoot_raygun(carousel_object) {
+
+    if (indexElement > 5)  { 
+        indexElement = 1;
+    }
+    startPoints();
+    audio2.play();
+    changeSpeed();
+  switch(carousel_object) {
+    case "funFacts1":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[0][indexElement]);
+        break;
+    case "funFacts2":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[1][indexElement]);
+        break;
+    case "funFacts3":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[2][indexElement]);
+        break;
+    case "funFacts4":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[3][indexElement]);
+        break;
+    case "funFacts5":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[4][indexElement]);
+        break;
+    case "funFacts6":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[5][indexElement]);
+        break;
+    case "funFacts7":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[6][indexElement]);
+        break;
+    case "funFacts8":
+          document.getElementById('Points').setAttribute('text-geometry', 'value: ' + funFacts[7][indexElement]);
+        break;
+    default:
+
+    }
+    indexElement = indexElement + 1;
+}
+function changeSpeed() {
+    if (rotation_speed < 5700) {
+        rotation_speed = 15500;
+    }
+    rotation_speed = rotation_speed - 1100;
+    document.getElementById('sittingDuckA').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckB').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckC').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckD').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckE').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckF').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckG').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckH').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    document.getElementById('sittingDuckI').setAttribute('alongpath', 'dur: ' + rotation_speed.toString());
+    playMusicSpeed = playMusicSpeed + 0.035;   
+    playSpeed = document.getElementById('playAudio');
+    playSpeed.playbackRate = playMusicSpeed;
+}
+function createArray(length) {
+    var arr = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    }
+
+    return arr;
+}
+funFacts = createArray((numberOfArrayDimension + 1), 45);
+funFacts[0][0] = "DARLING";
+funFacts[0][1] = "YOU & ME";
+funFacts[0][2] = "MARRY ME";
+funFacts[0][3] = "TRUE LOVE";
+funFacts[0][4] = "MY LOVE";
+funFacts[0][5] = "SAY YES";
+funFacts[1][0] = "DATE ME";
+funFacts[1][1] = "MY LOVE";
+funFacts[1][2] = "LOVE YOU";
+funFacts[1][3] = "BE SWEET";
+funFacts[1][4] = "HUG ME";
+funFacts[1][5] = "MY BABY";
+funFacts[2][0] = "CUTIE";
+funFacts[2][1] = "LOVE ME";
+funFacts[2][2] = "ALL MINE";
+funFacts[2][3] = "CRAZY 4U";
+funFacts[2][4] = "CUTIE PIE";
+funFacts[2][5] = "OH BABY!";
+funFacts[3][0] = "CALL ME";
+funFacts[3][1] = "HOT STUFF";
+funFacts[3][2] = "RED HOT";
+funFacts[3][3] = "EZ2 LOVE";
+funFacts[3][4] = "LOVE BUG";
+funFacts[3][5] = "XOXO";
+funFacts[4][0] = "CUTE";
+funFacts[4][1] = "KISS ME";
+funFacts[4][2] = "SOUL MATE";
+funFacts[4][3] = "SWEET HEART";
+funFacts[4][4] = "HOT LIPS";
+funFacts[4][5] = "LOVE ME";
+funFacts[5][0] = "ONLY YOU";
+funFacts[5][1] = "BE MINE";
+funFacts[5][2] = "I LUV U";
+funFacts[5][3] = "BE TRUE";
+funFacts[5][4] = "LIKE ME";
+funFacts[5][5] = "HOLD ME";
+funFacts[6][0] = "BE GOOD";
+funFacts[6][1] = "BE TRUE";
+funFacts[6][2] = "MISS YOU";
+funFacts[6][3] = "4 EVER";
+funFacts[6][4] = "REAL LUV";
+funFacts[6][5] = "SO FINE";
+funFacts[7][0] = "YOU ROCK";
+funFacts[7][1] = "LUV YAH";
+funFacts[7][2] = "DEAR ONE";
+funFacts[7][3] = "TXT ME";
+funFacts[7][4] = "TWEET ME";
+funFacts[7][5] = "RU SHY?";
+AFRAME.registerComponent('cursor-listener', {
+  init: function () {
+    this.el.addEventListener('click', function (evt) {
+    k = k - 1;
+    if (k < 1)  { 
+        k = 21; 
+        playMusicSpeed = 1;
+        playSpeed = document.getElementById('playAudio');
+        playSpeed.playbackRate = playMusicSpeed;
+        document.getElementById('sittingDuckA').setAttribute('visible', true);
+        document.getElementById('sittingDuckB').setAttribute('visible', true);
+        document.getElementById('sittingDuckC').setAttribute('visible', true);
+        document.getElementById('sittingDuckD').setAttribute('visible', true);
+        document.getElementById('sittingDuckE').setAttribute('visible', true);
+        document.getElementById('sittingDuckF').setAttribute('visible', true);
+        document.getElementById('sittingDuckG').setAttribute('visible', true);
+        document.getElementById('sittingDuckH').setAttribute('visible', true);
+        document.getElementById('sittingDuckI').setAttribute('visible', true);
+        document.getElementById('sittingDuckJ').setAttribute('visible', true);
+        document.getElementById('sittingDuckK').setAttribute('visible', true);
+        document.getElementById('sittingDuckL').setAttribute('visible', true);
+        document.getElementById('sittingDuckM').setAttribute('visible', true);
+        document.getElementById('sittingDuckN').setAttribute('visible', true);
+        document.getElementById('sittingDuckO').setAttribute('visible', true);
+        document.getElementById('sittingDuckP').setAttribute('visible', true);
+        document.getElementById('sittingDuckQ').setAttribute('visible', true);
+        document.getElementById('sittingDuckR').setAttribute('visible', true);
+        document.getElementById('sittingDuckS').setAttribute('visible', true);
+        document.getElementById('sittingDuckT').setAttribute('visible', true);
+        document.getElementById('sittingDuckU').setAttribute('visible', true);
+        m = m + 1;
+        if (m > planets.length)  { 
+            m = 0;  
+        }
+        document.getElementById('onplanet').setAttribute('environment', 'preset: ' + planets[m]);
+    } else {
+        this.setAttribute('visible', false);
+    }
+    });
+  }
+});
+AFRAME.registerComponent('audiohandler', {
+  init:function() {
+     let playing = false;
+     let audio = document.querySelector("#playAudio");
+     this.el.addEventListener('click', () => {
+
+          if(!playing) {
+              audio.play();
+           } else {
+              audio.pause();
+              audio.currentTime = 0;
+           }
+           playing = !playing;
+     });
+  }
+})
+
+      function playSound() {
+        }
+
+  </script>
+
+  </head>
+<body>
+    <button id="playButton" type="button">Play Music</button>
+    <audio id="playAudio" autoplay loop>
+      <!-- Song standard Licensed 10K purchased from Audio Jungle Be My Valentine by Tim McMorris -->
+        <source src="https://rocketvirtual.com/A-Frame_WebXR/assets/mp3/BeMyValentine.mp3" type="audio/mpeg">
+    </audio>
+    <a-scene cursor="rayOrigin: mouse; fuse: false" raycaster="objects: .raycastable, .clickable, a-link">
+     <a-assets>
+
+        <img crossorigin="anonymous" id="right" src="assets/img/box-logo-right.png">
+        <img crossorigin="anonymous" id="left" src="assets/img/box-logo-left.png">
+        <img crossorigin="anonymous" id="top" src="assets/img/box-logo-top.png">
+        <img crossorigin="anonymous" id="bottom" src="assets/img/box-logo-bottom.png">
+        <img crossorigin="anonymous" id="front" src="assets/img/box-logo-front.png">
+        <img crossorigin="anonymous" id="back" src="assets/img/box-logo-back.png">
+
+
+        <img crossorigin="anonymous" id="music-image_on" src="/assets/img/music6.png">
+        
+        <img crossorigin="anonymous" id="brought-to-you-by" src="/assets/img/by.png">
+
+        <a-asset-item id="heart" src="assets/obj/heart_lp.obj/heart_lp.obj" shadow="receive: false"></a-asset-item>
+        <!-- Our Font -->
+        <a-asset-item id="optimer_bold" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+    </a-assets>
+    <!-- Zoom and move the camera in for dramatic effects in browser window -->
+    <a-entity id="camera_yoyo" animation__second="property: position;
+                                         dir: alternate;
+                                         dur: 12000;
+                                         easing: easeInSine;
+                                         loop: true;
+                                         from: 0 1.6 0;
+                                         to: 0 9 0" begin="20000" >
+
+                   <a-camera look-controls wasd-controls mouse-cursor id="camera_zoom" position="0 1.6 0" user-height="1.6"
+                                animation="property: position;
+                                         dur: 15000;
+                                         from: 0 8 75;
+                                         to: 0 1.6 0;
+                                         easing: easeInOutSine;
+                                         loop: false;
+                                         direction: normal" >
+
+
+
+                    </a-camera>
+
+
+        <a-entity class="leftController" hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" visible="true"><!-- This is where we output text   --> 
+                                            <a-entity id="Points" text-geometry="value: ; font: #optimer_bold; bevelEnabled: false; curveSegments: 12; size: .35; height: 0;" material="color:pink; metalness:1; roughness: 0; transparent: false; opacity: 1" position=".15 0 0" scale=".25 .25 .25" ></a-entity>
+        </a-entity>
+         
+        <a-entity class="rightController" hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 40; interval: 0; objects: .clickable, a-link;" line="color: lawngreen; opacity: 0.5" visible="true"></a-entity>
+
+      </a-entity>
+              
+
+        <a-box id="playButton" class="clickable" position = "-2 6 -19" material="src: #music-image_on" scale="1.25 1.25 .25" onclick="playSound();" audiohandler cursor-listener ></a-box>
+        
+        <a-box id="to-website" class="clickable" position = "0.8 6 -19" material="src: #brought-to-you-by" scale="3.6 1.29 0.00001" onclick="location.href='https://rocketvirtual.com';" ></a-box>
+
+        <a-box id="gameLogo" position="0 9.5 -23.5" scale="5.48 4.76 5.36" multisrc="srcs:#right,#left,#top,#bottom,#front,#back" opacity="1">
+
+        <a-animation attribute="rotation"
+               dur="50000"
+               fill="forwards"
+               to="0 360 0"
+               repeat="indefinite"></a-animation></a-box>
+
+    <a-curve id="tracA" >
+
+
+
+        <a-curve-point position="0 4 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 4 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="7 4 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 4 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 4 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 4 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-8 4 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 4 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 4 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracB" curve="">
+        <a-curve-point position="0 7 2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 7 4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-8 7 10" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 7 15" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 7 17" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="6 7 14" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="7 7 10" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="6 7 5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 7 2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracC" curve="">
+        <a-curve-point position="12 5 11" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="14 5 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="10 5 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="6 5 -1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 5 2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-2 5 7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="1 5 12" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="6 5 14" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="12 5 11" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracD" curve="">
+        <a-curve-point position="9 9 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="3 9 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="1 9 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 9 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="9 9 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="14 9 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="16 9 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="14 9 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="9 9 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracE" curve="">
+        <a-curve-point position="0 6 -12" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-2 6 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="0 6 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="6 6 1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="9 6 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="13 6 -4" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="13 6 -9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="8 6 -14" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 6 -12" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracF" curve="">
+        <a-curve-point position="7 8 -9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="5 8 -15" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="0 8 -17" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-6 8 -15" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-8 8 -9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-4 8 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="3 8 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="7 8 -9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+   <a-curve id="tracG" curve="">
+        <a-curve-point position="1 3 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-3 3 -13" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-11 3 -13" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-14 3 -9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-13 3 -2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-7 3 1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-3 3 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="0 3 -3" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="1 3 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracH" curve="">
+        <a-curve-point position="-2 2 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-4 2 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-10 2 -7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-15 2 -5" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-17 2 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-15 2 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-10 2 8" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-4 2 6" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-2 2 0" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-curve id="tracI" curve="">
+        <a-curve-point position="-12 1 1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-14 1 9" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-9 1 14" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-1 1 12" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="1 1 7" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-1 1 2" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>  
+        <a-curve-point position="-6 1 -1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+        <a-curve-point position="-12 1 1" geometry="height:0.1;width:0.1;depth:0.1" material="color:#ff0000" curve-point="" visible="false"></a-curve-point>
+    </a-curve>
+    <a-obj-model  id="sittingDuckA" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #F44268" alongpath="curve:#tracA;loop:true;dur:12000;rotate:true" position="-4.27 1 -6" shadow="receive:false" rotation="-24 -90 90" animation__rotate="property:rotation;dur:5000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts1');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckB" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #F8E267" alongpath="curve:#tracB;loop:true;dur:14000;rotate:true" position="4.29 1 15.43" shadow="receive:false" rotation="0 261.96 0" animation__rotate="property:rotation;dur:5000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts2');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckC" class="clickable"  scale="0.05 0.05 0.05" src="#heart" material="color: #F585D3" alongpath="curve:#tracC;loop:true;dur:12000;rotate:true" position="-1.77 1 5.17" shadow="receive:false" rotation="0 261.96 0" animation__rotate="property:rotation;dur:5000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts3');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckD" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #B876F6" alongpath="curve:#tracD;loop:true;dur:12000;rotate:true" position="12.44 1 7.12" shadow="receive:false" rotation="0 261.96 0" animation__rotate="property:rotation;dur:3000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts4');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckE" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #E9EDF8" alongpath="curve:#tracE;loop:true;dur:12000;rotate:true" position="11.90 1 -2.37" shadow="receive:false" rotation="0 138.07 0" animation__rotate="property:rotation;dur:3000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts5');" cursor-listener></a-obj-model>
+   <a-obj-model id="sittingDuckF" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #F44268" alongpath="curve:#tracF;loop:true;dur:9000;rotate:true" position="-7.92 1 -8.56" shadow="receive:false" rotation="0 13.05 0" animation__rotate="property:rotation;dur:3000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts6');" cursor-listener></a-obj-model>
+   <a-obj-model id="sittingDuckG" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #F8E267" alongpath="curve:#tracG;loop:true;dur:12000;rotate:true" position="-9.22 1 0.45" shadow="receive:false" rotation="0 70.51 0" animation__rotate="property:rotation;dur:3000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts7');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckH" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #F585D3" alongpath="curve:#tracH;loop:true;dur:14000;rotate:true" position="-16.13 1 4.16" shadow="receive:false" rotation="0 23.64 0" animation__rotate="property:rotation;dur:3000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts8');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckI" class="clickable" scale="0.05 0.05 0.05" src="#heart" material="color: #B876F6" alongpath="curve:#tracI;loop:true;dur:12000;rotate:true" position="0.98 1 6.65" shadow="receive:false" rotation="0 -175.74 0" animation__rotate="property:rotation;dur:3000;easing:linear;loop:true;from:0 0 0;to:0 360 0" onclick="stopPoints();shoot_raygun('funFacts1');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckJ" class="clickable" position="1.8 3.6 -8" scale="0.005 0.005 0.005" src="#heart" material="color: #F8E267"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts2');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckK" class="clickable" position="1.5 3.6 -8" scale="0.01 0.01 0.01" src="#heart" material="color: #F585D3"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts3');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckL" class="clickable" position="1 3.6 -8" scale="0.02 0.02 0.02" src="#heart" material="color: #B876F6"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts4');" cursor-listener></a-obj-model>   
+    <a-obj-model id="sittingDuckM" class="clickable" position="0.1 3.6 -8" scale="0.03 0.03 0.03" src="#heart" material="color: #E9EDF8"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts5');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckN" class="clickable" position="2.8 8.6 -6" scale="0.005 0.005 0.005" src="#heart" material="color: #F44268"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts6');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckO" class="clickable" position="2.5 8.6 -6" scale="0.01 0.01 0.01" src="#heart" material="color: #F44268"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts7');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckP" class="clickable" position="2 8.6 -6" scale="0.02 0.02 0.02" src="#heart" material="color: #F44268"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts8');" cursor-listener></a-obj-model>   
+    <a-obj-model id="sittingDuckQ" class="clickable" position="1.1 8.6 -6" scale="0.03 0.03 0.03" src="#heart" material="color: #F44268"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts1');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckR" class="clickable" position="-5.8 5.6 -3" scale="0.005 0.005 0.005" src="#heart" material="color: #F8E267"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts2');" cursor-listener></a-obj-model>
+   <a-obj-model id="sittingDuckS" class="clickable" position="-5.5 5.6 -3" scale="0.01 0.01 0.01" src="#heart" material="color: #F585D3"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts3');" cursor-listener></a-obj-model>
+    <a-obj-model id="sittingDuckT" class="clickable" position="-5 5.6 -3" scale="0.02 0.02 0.02" src="#heart" material="color: #B876F6"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts4');" cursor-listener></a-obj-model>   
+    <a-obj-model id="sittingDuckU" class="clickable" position="-4.1 5.6 -3" scale="0.03 0.03 0.03" src="#heart" material="color: #E9EDF8"
+       animation__rotate="property: rotation; dur: 5000; easing: linear; loop: true; to: 0 360 0" onclick="stopPoints();shoot_raygun('funFacts5');" cursor-listener></a-obj-model>       
+    <a-entity id="onplanet" environment="preset: forest; shadow: true"></a-entity>
+    <a-entity class="environment" position="-1.2 2.94 3.03" light="intensity:0.5;castShadow:true;shadowCameraLeft:-20;shadowCameraBottom:-20;shadowCameraRight:20;shadowCameraTop:20" visible=""></a-entity>
+    <a-entity class="environmentDressing environment" visible="false"></a-entity>
+</a-scene>
+<script>
+window.onload = function() {
+  var context = new AudioContext();
+}
+document.querySelector('button').addEventListener('click', function() {
+  context.resume().then(() => {
+    console.log('Playback resumed successfully');
+  });
+});
+</script>
+</body>
+</html>
