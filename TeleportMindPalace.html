@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Mind Palace - Loading user space, please wait.</title>
+    <meta name="description" content="Teleport honeycomb rooms - August 27, 2021 By Michael McAnally">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <link rel="icon" type="image/png" href="favicon.ico"/>
+    <script src="VRCore/a-frame1.0.4.min.js"></script>
+    <script src="VRCore/aframe-extras.min.js"></script>
+    <script src="VRCore/aframe-teleport-controls.min.js"></script>
+    <script src="VRCore/aframe-text-geometry-component.min.js"></script>
+    <script src="VRCore/aframe-thumb-controls-component.min.js"></script>
+    <script src="VRCore/aframe-lensflare-component.min.js"></script>
+    <script src="VRCore/aframe-layout-component.min.js"></script>
+    <script src="VRCore/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+    <script src="VRCore/aframe-randomizer-components.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+    <script src="/js/info-message3.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/loader.css">
+    <script src="/js/loader.js"></script>
+    <script type="text/javascript">
+      var Speech = false;
+      var audio2 = new Audio('assets/wav/swoosh.wav');
+
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+            this.el.addEventListener('click', function (evt) {
+            });
+        }
+      });
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+                if(!playing) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                playing = !playing;
+            });
+        }
+      })
+     AFRAME.registerComponent('navigate', {
+        schema: {url: {default: ''}},
+        init: function () {
+        var data = this.data;
+            this.el.addEventListener('click', function () {
+                window.location = data.url;
+            });
+        }
+     });
+      function speakInfo(narration) {
+        var audio_msg = new SpeechSynthesisUtterance(narration);
+        if (Speech === true) {
+            window.speechSynthesis.speak(audio_msg);
+        }
+      }
+
+
+      function changeOrb(orb_num) {
+        document.getElementById('orbSky').setAttribute('material', 'src: #orb' + orb_num.toString());
+        removeScene();
+      }
+      function removeScene() {
+        document.getElementById('MeetingBuildings1').setAttribute('visible', false);
+        document.getElementById('MeetingBuildings2').setAttribute('visible', false);
+        document.getElementById('MeetingBuildings3').setAttribute('visible', false);
+        document.getElementById('Foundation').setAttribute('visible', false);
+        document.getElementById('ReturnIsland1').setAttribute('visible', true);
+        document.getElementById('ReturnIsland2').setAttribute('visible', true);
+        document.getElementById('ReturnIsland3').setAttribute('visible', true);
+      }
+      function restoreScene() {
+        document.getElementById('orbSky').setAttribute('material', 'src: #orb1');
+        document.getElementById('MeetingBuildings1').setAttribute('visible', true);
+        document.getElementById('MeetingBuildings2').setAttribute('visible', true);
+        document.getElementById('MeetingBuildings3').setAttribute('visible', true);
+        document.getElementById('Foundation').setAttribute('visible', true);
+        document.getElementById('ReturnIsland1').setAttribute('visible', false);
+        document.getElementById('ReturnIsland2').setAttribute('visible', false);
+        document.getElementById('ReturnIsland3').setAttribute('visible', false);
+      }
+
+      function playSwoosh() {
+        audio2.play();
+      }
+
+      function playSound() {
+      }
+
+    </script>
+  </head>
+  <body>
+    <div id="splash">
+      <div class="loading"></div>
+      <div class="start-button"><Font color="limegreen">(Select, then) Enter VR</Font> <i>Button at lower right or Instructions</i></div>
+    </div>
+    <button id="playButton" type="button">Play Music</button>
+    <audio id="playAudio" autoplay loop>
+        <!-- <source src="https://rocketvirtual.com/A-Frame_WebXR/assets/mp3/MozartALittleNightMusic.mp3" type="audio/mpeg">  -->
+    </audio>
+    <a-scene networked-scene="
+      room: Teleport;
+      debug: true;
+      adapter: easyrtc;
+      audio: true;
+      video: false;
+    " info-message="htmlSrc: #messageText" raycaster="objects: .raycastable, .clickable, a-link" shadow="type: pcfsoft" renderer="antialias: true; highRefreshRate: true" vr-mode-ui="arEnabled: false"> 
+      <a-assets >
+
+        <img crossorigin="anonymous" id="orb1" src="assets/360/image/skyland4.jpg">
+        <img crossorigin="anonymous" src="assets/img/floor1.jpg" id="floor" >
+        <a-asset-item id="MeetingComplex1" src="assets/gltf/HexRoomMosaicA.glb" nav-agent="speed: 1.0; active: true"></a-asset-item>
+        <a-asset-item id="MeetingComplex2" src="assets/gltf/HexRoomMosaicD.glb" nav-agent="speed: 1.0; active: true"></a-asset-item>
+        <a-asset-item id="MeetingComplex3" src="assets/gltf/HexRoomMosaicC.glb" nav-agent="speed: 1.0; active: true"></a-asset-item>
+        <a-asset-item id="messageText" src="ControlsMessage.html" response-type="text"></a-asset-item>
+
+        <img crossorigin="anonymous" id="orbthumb4" src="assets/360/image/thumb/theBeach_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb5" src="assets/360/image/thumb/SAM_101_0370_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb7" src="assets/360/image/thumb/SAM_100_0128_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb8" src="assets/360/image/thumb/SAM_101_0128_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb9" src="assets/360/image/thumb/SAM_101_0109_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb10" src="assets/360/image/thumb/SAM_101_0152_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb11" src="assets/360/image/thumb/SAM_101_0118_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb12" src="assets/360/image/thumb/SAM_101_0021_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb13" src="assets/360/image/thumb/360_0425_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb14" src="assets/360/image/thumb/SAM_101_0346_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb15" src="assets/360/image/thumb/360_0449_thumb.jpg">
+        <img crossorigin="anonymous" id="orbthumb16" src="assets/360/image/thumb/SAM_101_0032_thumb.jpg">
+
+        <img crossorigin="anonymous" id="orb4" src="assets/360/image/theBeach.jpg">
+        <img crossorigin="anonymous" id="orb5" src="assets/360/image/SAM_101_0370.jpg">
+        <img crossorigin="anonymous" id="orb7" src="assets/360/image/SAM_100_0128.jpg">
+        <img crossorigin="anonymous" id="orb8" src="assets/360/image/SAM_101_0128.jpg">
+        <img crossorigin="anonymous" id="orb9" src="assets/360/image/SAM_101_0109.jpg">
+        <img crossorigin="anonymous" id="orb10" src="assets/360/image/SAM_101_0152.jpg">
+        <img crossorigin="anonymous" id="orb11" src="assets/360/image/SAM_101_0118.jpg">
+        <img crossorigin="anonymous" id="orb12" src="assets/360/image/SAM_101_0021.jpg">
+        <img crossorigin="anonymous" id="orb13" src="assets/360/image/360_0425.jpg">
+        <img crossorigin="anonymous" id="orb14" src="assets/360/image/SAM_101_0346.jpg">
+        <img crossorigin="anonymous" id="orb15" src="assets/360/image/360_0449.jpg">
+        <img crossorigin="anonymous" id="orb16" src="assets/360/image/SAM_101_0032.jpg">
+
+        <img crossorigin="anonymous" id="ReturnBack" src="assets/img/ReturnBack.png">
+
+        <img crossorigin="anonymous" id="flare-asset" src="assets/img/adjustflare.jpg">
+        <a-asset-item id="optimerBoldFont" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+        <a-mixin id="spin" animation="property: rotation; to: 0 360 0; loop: true; dur: 100000; easing: linear"></a-mixin>
+        <a-mixin id="marble" geometry="primitive: sphere" scale=".45 .45 .45" animation__rotation="startEvents: mouseenter; pauseEvents: mouseleave; resumeEvents: mouseenter; property: rotation; to: 0 360 0; loop: true; dur: 10000" animation__mouseenter="startEvents: mouseenter; pauseEvents: mouseleave; resumeEvents: mouseenter; property: components.material.material.color; type: color; to: white;  dur: 500; " animation__mouseleave="property: components.material.material.color; type: color; to: gray; startEvents: mouseleave; dur: 500;" shadow ></a-mixin>
+
+        <a-asset-item id="RobotHead" src="assets/gltf/FinalEditRoboHead.glb"></a-asset-item>
+        <a-asset-item id="LHand" src="assets/gltf/leftHandLow.glb"></a-asset-item>
+        <a-asset-item id="RHand" src="assets/gltf/rightHandLow.glb"></a-asset-item>
+        <template id="avatar-template">
+          <a-entity networked-audio-source></a-entity>
+        </template>
+        <template id="head-template">
+          <a-entity class="cam" gltf-model="#RobotHead" scale="0.004 0.004 0.004"></a-entity>
+        </template>
+        <template id="hand-left">
+          <a-entity class="leftController">
+            <a-entity gltf-model="#LHand" ></a-entity>
+          </a-entity>
+        </template>
+        <template id="hand-right">
+          <a-entity class="rightController">
+            <a-entity gltf-model="#RHand" ></a-entity>
+          </a-entity>
+        </template>
+
+      </a-assets>
+
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+      <a-entity id="navmesh-walls" gltf-model="assets/gltf/HexigonalNavmesh.gltf" visible="false" nav-mesh=""></a-entity>
+      <a-entity id="avatar" networked="template:#avatar-template;attachTemplateToLocal:false;"
+        movement-controls="constrainToNavMesh: true;" spawn-in-circle="radius:1">
+        <a-entity class="cam" networked="template:#head-template;attachTemplateToLocal:false;" camera="active: true"
+          position="0 1.6 0" look-controls></a-entity>
+        <a-entity class="leftController" networked="template:#hand-left;attachTemplateToLocal:false;"
+          hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF"  teleport-controls="cameraRig: #avatar; teleportOrigin: #cam; button: trigger; type: line; curveShootingSpeed: 10; collisionEntities: #navmesh-walls; landingMaxAngle: 60" visible="true" ></a-entity>
+        <a-entity class="rightController" networked="template:#hand-right;attachTemplateToLocal:false;"
+          hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 25; interval: 0; objects: .raycastable, .clickable, a-link;" line="color: #7cfc00; opacity: 0.5" visible="true"></a-entity>
+      </a-entity>
+
+
+      <a-entity
+        id="background"
+        position="0 0 0"
+        geometry="primitive: sphere; radius: 2.0"
+        material="color: red; side: back; shader: flat"
+        scale="0.001 0.001 0.001"
+        visible="false" class="raycastable">
+      </a-entity>
+
+      <a-entity light="type: ambient; intensity: 0.85"></a-entity>
+
+      <a-sky id="orbSky" material="src: #orb1" rotation="0 0 0" ></a-sky>
+      <a-sphere id="flare" radius="0.05" color="yellow" lensflare="createLight:false; relative: true; src: #flare-asset; lightColor:yellow; intensity: 5; lightDecay: 500" position="0 60 0"></a-sphere>
+      <a-entity id="MeetingBuildings1" gltf-model="#MeetingComplex1" position="0 0.01054 0" rotation="0 0 0" scale="0.02 0.02 0.02" shadow="" ></a-entity>
+      <a-entity id="MeetingBuildings2" gltf-model="#MeetingComplex2" position="8.95232 0.01054 -15.72084" rotation="0 119.99999999999999 0" scale="0.02 0.02 0.02" shadow="" ></a-entity>
+      <a-entity id="MeetingBuildings3" gltf-model="#MeetingComplex3" position="-9.72141 0.01054 -16.05028" rotation="0 -120 0" scale="0.02 0.02 0.02" shadow="" ></a-entity>
+      <a-box id="Foundation" position="0.08191 -0.159 -10.36956" rotation="-90.00021045914971 90 0" scale="13.29474 10.89561 0.32555" width="4" height="4" color="#FFFFFF" shadow="receive: true" material="src: #floor; color: white; transparent: true; repeat: 50 50" geometry=""></a-box>
+
+      <a-entity layout="type: circle; radius: 2.5; plane: xz;" position="0 1 0" >
+
+        <a-sphere id="orb_place4" class="clickable" mixin="marble" rotation="0 45 0" material="src: #orbthumb4" onclick="playSwoosh();changeOrb(4);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place5" class="clickable" mixin="marble" rotation="0 45 0" material="src: #orbthumb5" onclick="playSwoosh();changeOrb(5);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place7" class="clickable" mixin="marble" rotation="0 45 0" material="src: #orbthumb7" onclick="playSwoosh();changeOrb(7);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place8" class="clickable" mixin="marble" rotation="0 45 0" material="src: #orbthumb8" onclick="playSwoosh();changeOrb(8);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+
+        <a-box id="ReturnIsland1" class="clickable" rotation="0 -180 0" material="src: #ReturnBack" scale="0.5 0.5 0.5" onclick="restoreScene();" shadow visible="false" click-listener></a-box>
+
+      </a-entity>
+
+      <a-entity layout="type: circle; radius: 2.5; plane: xz; reverse: true;" position="8.9596 1 -15.77586" >
+
+        <!-- Actual orbs and there rotation  -->
+        <a-sphere id="orb_place9" class="clickable" mixin="marble" rotation="0 -125 0" material="src: #orbthumb9" onclick="playSwoosh();changeOrb(9);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place10" class="clickable" mixin="marble" rotation="0 85 0" material="src: #orbthumb10" onclick="playSwoosh();changeOrb(10);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place11" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb11" onclick="playSwoosh();changeOrb(11);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place12" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb12" onclick="playSwoosh();changeOrb(12);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+
+        <a-box id="ReturnIsland2" class="clickable" rotation="0 -180 0" material="src: #ReturnBack" scale="0.5 0.5 0.5" onclick="restoreScene();" shadow="" visible="false" geometry="" click-listener></a-box>
+
+      </a-entity>
+
+      <a-entity layout="type: circle; radius: 2.5; plane: xz;" position="-9.50112 1 -16.20593" >
+
+        <!-- Actual orbs and there rotation  -->
+        <a-sphere id="orb_place13" class="clickable" mixin="marble" rotation="0 -125 0" material="src: #orbthumb13" onclick="playSwoosh();changeOrb(13);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place14" class="clickable" mixin="marble" rotation="0 85 0" material="src: #orbthumb14" onclick="playSwoosh();changeOrb(14);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place15" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb15" onclick="playSwoosh();changeOrb(15);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+        <a-sphere id="orb_place16" class="clickable" mixin="marble" rotation="0 -75 0" material="src: #orbthumb16" onclick="playSwoosh();changeOrb(16);" onmouseenter="speakInfo('San Francisco Market Street');" click-listener></a-sphere>
+
+        <a-box id="ReturnIsland3" class="clickable" rotation="0 -180 0" material="src: #ReturnBack" scale="0.5 0.5 0.5" onclick="restoreScene();" shadow="" visible="false" geometry="" click-listener></a-box>
+
+      </a-entity>
+
+    </a-scene>
+    <script>
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#head-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-left',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-right',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      function onConnect() {
+        console.log("connected to a room!");
+      }
+window.onload = function() {
+  var context = new AudioContext();
+}
+document.querySelector('button').addEventListener('click', function() {
+  context.resume().then(() => {
+    console.log('Playback resumed successfully');
+  });
+});
+
+    </script>
+  </body>
+</html>
