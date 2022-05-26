@@ -5,7 +5,7 @@ Simple code example templates for starting your own projects. These are A-frame 
 
 Note: Please take special notice of the A-frame component version numbers used as there have been many changes and deprications and some later versions of A-frame and THREE.js that may break these code examples.  Some changes also have occured to the browsers, Chrome, Firefox, the Meta Quest Browser.  As of May 26, 2022 these examples worked well on the Oculus Meta Quest 2.  No guarentees they will continue to work as the WebXR space is rapidly evolving.  Best always to search for other working examples on the web which may be more current.  Follow me on twitter https://twitter.com/Michael_Blade and my VR Blog https://rocketvirtual.com for the latest.
 
-IMPORTANT: In the example I may display wall art pieces, photos and paintings. Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only for demonstration purposes.
+IMPORTANT: In some of the examples I may display wall art pieces, photos and paintings. Be sure to replace my art with your own or art which you have rights to display, as my art is copyright and is here as a placeholder only for demonstration purposes.  Also I have paid for license to a couple of songs.  Please replace these with your own songs which you have rights for.  Thank you for your honesty and consideration for the work of others.
 
 ---------------
 
