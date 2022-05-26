@@ -102,6 +102,11 @@ https://michael-mcanally.medium.com/my-360-mind-place-web-app-for-caputuring-imm
 
 ---------------
 
+Setting Up A Raspberry Pi As A Home Metaverse Server For Your VR Headset!
+
+Extremely detailed articles
+
+https://michael-mcanally.medium.com/setting-up-a-raspberry-pi-as-a-home-metaverse-server-for-your-vr-headset-12632ac1b871
 
 
 ---------------
