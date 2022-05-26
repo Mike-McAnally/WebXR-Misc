@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Holiday VR Card</title>
+    <meta name="description" content="Happy holidays! Recreation of the snow holiday VR-card using WebXR A-frame and Networked A-frame (NAF) for multi-user communication over WebRTC.  See: Instructions Button for setup.">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <link rel="icon" type="image/png" href="favicon.ico"/>
+    <script src="VRCore/aframe-master.min.js"></script>
+    <script src="VRCore/aframe-extras.min.js"></script>
+    <script src="VRCore/aframe-environment-component.min.js"></script>
+    <script src="VRCore/aframe-teleport-controls.min.js"></script>
+    <script src="VRCore/aframe-text-geometry-component.min.js"></script>
+    <script src="VRCore/aframe-thumb-controls-component.min.js"></script>
+    <script src="VRCore/aframe-lensflare-component.min.js"></script>
+    <script src="VRCore/aframe-particle-system-component.min.js"></script>
+    <script src="VRCore/socket.io.slim.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="/dist/networked-aframe.js"></script>
+    <script src="VRCore/aframe-randomizer-components.min.js"></script>
+    <script src="/js/spawn-in-circle.component.js"></script>
+    <script src="/js/info-message3.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/loader.css">
+    <script src="/js/loader.js"></script>
+
+    <!-- The JavaScript below provides for selection and action on objects, environment and audio -->
+    <script type="text/javascript">
+
+AFRAME.registerComponent('navigate', {
+  schema: {url: {default: ''}},
+  init: function () {
+    var data = this.data;
+    this.el.addEventListener('click', function () {
+      window.location = data.url;
+    });
+  }
+});
+
+
+
+      // Component to do on click.
+      AFRAME.registerComponent('click-listener', {
+        init: function () {
+
+            this.el.addEventListener('click', function (evt) {
+
+
+      
+            });
+        }
+      });
+
+
+      //   Solves Google Chrome mute of audio https://stackoverflow.com/questions/47921013/play-sound-on-click-in-a-frame?answertab=active#tab-top
+      AFRAME.registerComponent('audiohandler', {
+        init:function() {
+            let playing = false;
+            let audio = document.querySelector("#playAudio");
+            this.el.addEventListener('click', () => {
+
+                if(!playing) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+                playing = !playing;
+            });
+        }
+      })
+
+    </script>
+
+  </head>
+  <body>
+
+    <button id="playButton" type="button">Play Music</button>
+    <audio id="playAudio" autoplay loop>
+         <!-- Jingle Bells Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0 License
+http://creativecommons.org/licenses/by/3.0/ -->
+        <source src="assets/mp3/JingleBells2.mp3" type="audio/mpeg">
+    </audio>
+
+    <a-scene networked-scene="
+      room: xmas;
+      debug: true;
+      adapter: easyrtc;
+      audio: true;
+      video: false;" info-message="htmlSrc: #messageText" renderer="antialias: true;" background="color: #212">
+
+      <a-assets>
+            <!-- Our font -->
+            <a-asset-item id="optimerBoldFont" src="assets/fonts/optimer_bold.typeface.json"></a-asset-item>
+
+            <a-asset-item id="messageText" src="ControlsMessage.html" response-type="text"></a-asset-item>
+
+            <img crossorigin="anonymous" id="flare-asset" src="assets/img/adjustflare.jpg">
+
+            <a-asset-item id="xmas" src="assets/gltf/xmas.glb"></a-asset-item>
+
+            <img crossorigin="anonymous" id="music-image_on" src="assets/img/music.png">
+
+            <img crossorigin="anonymous" id="sphereWrap" src="assets/img/snowball.png">
+
+            <a-asset-item id="RobotHead" src="assets/gltf/FinalEditRoboHead.glb"></a-asset-item>
+            <a-asset-item id="LHand" src="assets/gltf/leftHandLow.glb"></a-asset-item>
+            <a-asset-item id="RHand" src="assets/gltf/rightHandLow.glb"></a-asset-item>
+        
+        <template id="avatar-template">
+          <a-entity networked-audio-source></a-entity>
+        </template>
+        <template id="head-template">
+          <a-entity class="cam" gltf-model="#RobotHead" scale="0.004 0.004 0.004"></a-entity>
+        </template>
+        <template id="hand-left">
+          <a-entity class="leftController">
+            <a-entity gltf-model="#LHand" ></a-entity>
+          </a-entity>
+        </template>
+        <template id="hand-right">
+          <a-entity class="rightController">
+            <a-entity gltf-model="#RHand" ></a-entity>
+          </a-entity>
+        </template>
+
+      </a-assets>
+
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
+
+      <a-entity id="navmesh-walls" gltf-model="assets/gltf/AdvHelloWorldnavmesh.gltf" visible="false" nav-mesh=""></a-entity>
+
+      <a-entity id="avatar" networked="template:#avatar-template;attachTemplateToLocal:false;"
+        movement-controls="constrainToNavMesh: true;" spawn-in-circle="radius:3">
+        <a-entity class="cam" networked="template:#head-template;attachTemplateToLocal:false;" camera="active: true"
+          position="0 1.6 8" look-controls ></a-entity>
+        <a-entity class="leftController" networked="template:#hand-left;attachTemplateToLocal:false;"
+          hand-controls="hand: left; handModelStyle: lowPoly; color: #15ACCF" teleport-controls="cameraRig: #avatar; teleportOrigin: #cam; button: trigger; type: line; curveShootingSpeed: 10; collisionEntities: #navmesh-walls; landingMaxAngle: 60" visible="true" ></a-entity>
+        <a-entity class="rightController" networked="template:#hand-right;attachTemplateToLocal:false;"
+          hand-controls="hand: right; handModelStyle: lowPoly; color: #15ACCF" laser-controls raycaster="showLine: true; far: 10; interval: 0; objects: .clickable, a-link;" line="color: #7cfc00; opacity: 0.5" visible="true"></a-entity>
+      </a-entity>
+
+      <!-- Normal Hello World objects modified to respond to onclick and audio  -->
+      <a-box id="cube" class="clickable" position="-1 0.66921 -3" rotation="0 45 0" color="#4CC3D9" visible="true" material="src: #music-image_on" shadow audiohandler ></a-box>
+      <a-sphere id="sphere" class="clickable" position="0 1.44508 -5" radius="1.25" color="#EF2D5E" material="src: #sphereWrap; repeat: 2,2" shadow navigate="url: https://aframe.io/" click-listener></a-sphere>
+      <a-cylinder id="cylinder" class="clickable" position="1 0.8993 -3" radius="0.5" height="1.5" color="#FFC65D" shadow navigate="url: https://funbit64.com/" click-listener></a-cylinder>
+      <a-plane position="0 0.08958 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow="recieve: true" ></a-plane >
+
+      <!-- Snowman Xmas tree scene  -->
+      <a-entity gltf-model="#xmas" position="-0.909 -0.150 -4.014"scale="2.7 2.7 2.7" position="0 -.15 -6" ></a-entity>
+
+      <!-- Our Environment -->
+      <a-entity environment="preset: goldmine; seed: 2; shadow: true; dressingAmount: 0;fog:0.65; ground: hills; groundTexture: none; groundColor: #FFFAFA; groundColor2: #FEFEFA; grid: 1x1; gridColor: #81F995; skyType: gradient; skyColor: #A4CFFA; horizonColor: #95C8FA;" shadow="recieve: true"></a-entity>
+
+      <!-- Some 3D Text -->
+      <a-entity position="-3.620 6.1986.198 -5.127" text-geometry="value: Networked A-frame" material="color: red"></a-entity>
+      <a-entity position="-3.605 5.303 -5.090" text-geometry="value: Happy Holidays Multi-user VR Card; font: #optimerBoldFont" material="color: black"></a-entity>
+
+      <!-- Place the Sun -->
+      <a-sphere id="flare" radius="0.05" color="yellow" lensflare="createLight:false; relative: true; src: #flare-asset; lightColor:yellow; intensity: 5; lightDecay: 500" position="0.599 26.208 77.196"></a-sphere>
+
+      <!-- It's snowing too! -->
+      <a-entity position="0 2.25 -15" particle-system="preset: snow; particleCount: 1000"></a-entity>
+
+      <!-- A light in the scene casting shadows -->
+      <a-entity light="intensity: 0.6; castShadow: true; shadowCameraLeft: -50; shadowCameraBottom: -50; shadowCameraRight: 50; shadowCameraTop: 50; shadowCameraVisible: false" position="9.9649 17.32329 13.93447"></a-entity>
+
+    </a-scene>
+<script>
+
+
+
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#head-template',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-left',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      NAF.schemas.add({
+        template: '#hand-right',
+        components: [
+          'position',
+          'rotation',
+        ]
+      });
+      function onConnect() {
+        console.log("connected to a room!");
+      }
+
+
+window.onload = function() {
+  var context = new AudioContext();
+}
+
+document.querySelector('button').addEventListener('click', function() {
+  context.resume().then(() => {
+    console.log('Playback resumed successfully');
+  });
+});
+
+
+</script>
+  </body>
+</html>
