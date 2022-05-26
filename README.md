@@ -1,5 +1,5 @@
 # WebXR-Misc
-WebXR Misc Code Examples
+WebXR Misc Template Code Examples
 
 Simple code example templates for starting your own projects. These are A-frame VR examples of basic HTML and JavaScript.  Does not include associated assets and other code components, those can be accessed from the servers themselves. When available I have include links to articles I have written explaining how the code works.  Many of the example use networked-aframe a multi-user WebRTC social VR component for servers.
 
