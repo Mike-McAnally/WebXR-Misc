@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Treasure Island - Loading, please wait.</title>
+    <meta name="description" content="My Treasure Island Art VR Gallery with Meeting and Video Complex by Michael McAnally, September 3, 2022.">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="gray-translucent" />
+    <script src="VRCore/aframe-master.min.js"></script>
+    <script src="https://recast-api.donmccurdy.com/aframe-inspector-plugin-recast.js"></script>
+
+
+
+
+  </head>
+
+  <body>
+
+    <a-scene inspector-plugin-recast > 
+      <a-assets >
+        <a-asset-item crossorigin="anonymous" id="Island" src="assets/gltf/IslandSmooth.glb"></a-asset-item>
+
+
+
+         <!-- Hex Rooms -->
+         <a-asset-item id="MeetingComplex" src="assets/gltf/HexRoomMosaicA.glb" nav-agent="speed: 1.0; active: true"></a-asset-item>
+
+
+
+        <!-- <a-asset-item id="fountain" src="assets/gltf/marble_fountain.glb"></a-asset-item> -->       
+
+        <a-asset-item id="Table1" src="assets/gltf/tableFixed14.glb"></a-asset-item>
+
+
+                
+
+
+
+
+        <a-asset-item id="Bush_Flowers2" src="assets/gltf/Bush_Flowers2.glb"></a-asset-item>
+
+
+        <a-mixin id="marble" geometry="primitive: sphere" scale=".30 .30 .30" ></a-mixin>
+
+
+  
+      </a-assets>
+
+
+      <a-entity id="The_Island" gltf-model="#Island" position="-208.88164 -9.83526 -154.40424" scale="140 140 140" visible="" shadow="cast: false; receive: true"></a-entity>
+
+      <a-box id="Foundation" position="-3.32823 -0.09738 -7.89352" rotation="-90.00021045914971 90 0" scale="13.29474 10.89561 0.32555" width="4" height="4" color="#FFFFFF" shadow="receive: true" material="color: white; transparent: true; repeat: 50 50" geometry=""></a-box>
+
+      <a-entity id="MeetingBuildings" gltf-model="#MeetingComplex" position="7.887 0.07 -9.352" rotation="0 90 0" scale="0.02 0.02 0.02" shadow=""></a-entity>
+      <a-entity id="MeetingBuildings2" gltf-model="#MeetingComplex" position="-5.053 0.07 7.499" rotation="0 0 0" scale="0.02 0.02 0.02" shadow=""></a-entity>
+      <a-entity id="MeetingBuildings3" gltf-model="#MeetingComplex" position="-5.266 0.07 -24.750" rotation="0 -180 0" scale="0.02 0.02 0.02" shadow=""></a-entity>
+      <!-- Bridges allowing us to move around the island and on multiple levels.  -->
+      <a-box id="water-bridge" position="-44.05655 -4.30731 -22.47425" rotation="-72.20929796254252 179.95229246350846 89.64325775278321" scale="6.0626 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-box id="bridge-3" position="-31.82349 5.17492 28.89981" rotation="-72.60521179897792 142.80400085840637 -82.01718949959195" scale="13.92453 1 0.143" width="4" height="4" color="#FFFFFF" opacity=".35" material="" geometry=""></a-box>
+      <a-box id="bridge-7" position="-36.59874 -0.42997 -9.33153" rotation="-89.12816869496059 -90.00021045914971 90.00021045914971" scale="7.25388 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-box id="bridge-8" position="-91.33488 -0.62497 -42.07341" rotation="-89.66732198017871 44.930204378568895 -55.969382217354465" scale="8.09068 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+
+
+      <!-- <a-cylinder id="cylinder1" position="-16.813 0.08504 -2.103" scale="1.372 0.113 1.372" radius="0.5" height="1.5" color="#E3E3E3" shadow="" material="" geometry=""></a-cylinder>
+      <a-sphere id="sphere1" position="-16.813 -0.0407 -2.103" scale="0.457 0.307 0.457" radius="1.25" color="#51A727" shadow="" material="" geometry=""></a-sphere>
+      <a-cylinder id="cylinder2" position="-17.030 0.08504 -16.375" scale="1.372 0.113 1.372" radius="0.5" height="1.5" color="#E3E3E3" shadow="" material="" geometry=""></a-cylinder>
+      <a-sphere id="sphere2" position="-17.030 -0.0407 -16.375" scale="0.457 0.307 0.457" radius="1.25" color="#51A727" shadow="" material="" geometry=""></a-sphere> -->
+      <!-- <a-entity id="waterfountain" gltf-model="#fountain" position="-13.491 -0.14203 -9.204" scale="2 .75 2" shadow=""></a-entity>  -->
+
+
+
+      <!-- <a-cylinder id="cylinder4" position="-13.491 0.07067 -9.204" scale="2.292 0.207 2.292" radius="0.5" height="1.5" color="#18C7D2" shadow="" material="" geometry="" opacity=".35"></a-cylinder> -->
+
+      <!-- <a-cylinder id="cylinder5" position="-13.491 1.01776 -9.204" scale="1.36 0.00668 1.36" radius="0.5" height="1.5" color="#18C7D2" shadow="" material="" geometry="" opacity=".35"></a-cylinder> -->      
+
+
+
+      <a-box id="Pedistal2" position="12.137 0.557 -9.570" rotation="0 -96.895 0" color="#FFFFFF" visible="" shadow="" material="" geometry=""></a-box>
+
+
+
+      <a-box id="Pedistal" position="6.749 0.55738 -4.451" rotation="0 45 0" color="#FFFFFF" visible="" shadow="" material="" geometry=""></a-box>
+
+
+      <a-cylinder id="cylinder3" position="7.909 0.698 -9.350" radius="0.5" height="1.5" scale=".7 0.660 .7" color="#FFFFFF" shadow></a-cylinder>
+
+
+      <a-sphere id="orb_place5" mixin="marble" position="-5.162 0.83949 9.520" rotation="0 45 0" ></a-sphere>
+      <a-sphere id="orb_place7" mixin="marble" position="-7.144 0.83949 7.539" rotation="0 45 0"></a-sphere>
+      <a-sphere id="orb_place8" mixin="marble" position="-3.205 0.83949 7.601" rotation="0 45 0"></a-sphere>
+
+
+
+      <!-- <a-entity id="MeetingTable" gltf-model="#Table1" position="-5.362 0.251 -24.650" rotation="0 -180 0" scale="0.000075 0.000035 0.000075" shadow="" visible=""></a-entity>   -->
+
+
+      <a-box id="hex-ramp" position="7.815 3.535 -24.762" rotation="-60 90 -90" scale="3.58635 0.868 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-box id="hex-between1" position="2.091 7.067 -0.013" rotation="-90.000 -120.000 0.000" scale="1.824 0.491 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+      <a-box id="hex-between2" position="2.115 7.06669 -17.855" rotation="-89.222 -0.012 127.790" scale="1.452 0.482 0.143" width="4" height="4" color="#FFFFFF" shadow="" material="" geometry="" opacity=".35"></a-box>
+
+
+
+
+
+    </a-scene>
+
+  </body>
+</html>
